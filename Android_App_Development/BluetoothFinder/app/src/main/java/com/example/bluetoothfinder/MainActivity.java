@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -89,5 +90,20 @@ public class MainActivity extends AppCompatActivity {
         bluetoothDevices.clear();
         addresses.clear();
         bluetoothAdapter.startDiscovery();
+    }
+
+    public void turnOn(View v){
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOn, 0);
+            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void turnOff(View v){
+        bluetoothAdapter.disable();
+        Toast.makeText(getApplicationContext(), "Turned off" ,Toast.LENGTH_LONG).show();
     }
 }

@@ -2,4 +2,7 @@
     <string name="app_name">Bluetooth Finder</string>
     <string name="button">Button</string>
     <string name="textview">TextView</string>
+    <string name="search_devices">Search Devices</string>
+    <string name="turn_on">Turn ON</string>
+    <string name="turn_off">Turn OFF</string>
 </resources>
