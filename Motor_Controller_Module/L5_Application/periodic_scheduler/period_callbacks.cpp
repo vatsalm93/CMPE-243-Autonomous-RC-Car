@@ -36,7 +36,10 @@
 #include "printf_lib.h"
 #include "utilities.h"
 
-PWM *motor_control;
+PWM *motor_control1;
+PWM *motor_control2;
+PWM *motor_control3;
+
 PWM *servo_control;
 
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
@@ -52,13 +55,18 @@ const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 /// Called once before the RTOS is started, this is a good place to initialize things once
 bool period_init(void)
 {
-    motor_control = new PWM(PWM::pwm2, 50);
-    servo_control = new PWM(PWM::pwm3, 50);
+    motor_control1 = new PWM(PWM::pwm1, 100);
+    motor_control2 = new PWM(PWM::pwm2, 100);
+    motor_control3 = new PWM(PWM::pwm3, 100);
+    servo_control = new PWM(PWM::pwm4, 100);
 //    PWM motor_control2(PWM::pwm3, 2);
 //    PWM motor_control3(PWM::pwm4, 2);
 
-    motor_control->set(8);
-    servo_control->set(10);
+    motor_control1->set(14);
+    motor_control2->set(15);
+    motor_control3->set(16);
+
+    servo_control->set(11);
 //    motor_control2.set(7.5);
 //    motor_control3.set(9);
 
