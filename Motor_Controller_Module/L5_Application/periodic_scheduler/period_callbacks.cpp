@@ -36,9 +36,8 @@
 #include "printf_lib.h"
 #include "utilities.h"
 
-PWM motor_control1(PWM::pwm2, 2);
-PWM motor_control2(PWM::pwm3, 2);
-PWM motor_control3(PWM::pwm4, 2);
+PWM *motor_control;
+PWM *servo_control;
 
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
 const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
@@ -53,11 +52,16 @@ const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 /// Called once before the RTOS is started, this is a good place to initialize things once
 bool period_init(void)
 {
-    motor_control1.set(6);
-    motor_control2.set(7.5);
-    motor_control3.set(9);
-   // motor_control.set(5);
-    //delay_ms(1000);
+    motor_control = new PWM(PWM::pwm2, 50);
+    servo_control = new PWM(PWM::pwm3, 50);
+//    PWM motor_control2(PWM::pwm3, 2);
+//    PWM motor_control3(PWM::pwm4, 2);
+
+    motor_control->set(8);
+    servo_control->set(10);
+//    motor_control2.set(7.5);
+//    motor_control3.set(9);
+
     return C_period_init(); // Must return true upon success
 }
 
@@ -76,8 +80,6 @@ bool period_reg_tlm(void)
 
 void period_1Hz(uint32_t count)
 {
-
-
 //    if(count%3 == 0)
 //     motor_control.set(10);
 //     u0_dbg_printf("Set to left\n");
@@ -91,15 +93,11 @@ void period_1Hz(uint32_t count)
 
 void period_10Hz(uint32_t count)
 {
-
-    //motor_control.set(5);
  //   C_period_10Hz(count);
 }
 
 void period_100Hz(uint32_t count)
 {
-   // motor_control.set(15);
-    //motor_control.set(5);
    // C_period_100Hz(count);
 }
 
@@ -107,6 +105,5 @@ void period_100Hz(uint32_t count)
 // scheduler_add_task(new periodicSchedulerTask(run_1Khz = true));
 void period_1000Hz(uint32_t count)
 {
-    //motor_control.set(5);
     //C_period_1000Hz(count);
 }
