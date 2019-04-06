@@ -36,10 +36,7 @@
 #include "printf_lib.h"
 #include "utilities.h"
 
-PWM *motor_control1;
-PWM *motor_control2;
-PWM *motor_control3;
-
+PWM *motor_control;
 PWM *servo_control;
 
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
@@ -55,20 +52,11 @@ const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 /// Called once before the RTOS is started, this is a good place to initialize things once
 bool period_init(void)
 {
-    motor_control1 = new PWM(PWM::pwm1, 100);
-    motor_control2 = new PWM(PWM::pwm2, 100);
-    motor_control3 = new PWM(PWM::pwm3, 100);
-    servo_control = new PWM(PWM::pwm4, 100);
-//    PWM motor_control2(PWM::pwm3, 2);
-//    PWM motor_control3(PWM::pwm4, 2);
+    motor_control = new PWM(PWM::pwm2, 100);
+    servo_control = new PWM(PWM::pwm3, 100);
 
-    motor_control1->set(14);
-    motor_control2->set(15);
-    motor_control3->set(16);
-
-    servo_control->set(11);
-//    motor_control2.set(7.5);
-//    motor_control3.set(9);
+    motor_control->set(15);
+    servo_control->set(15);
 
     return C_period_init(); // Must return true upon success
 }
@@ -88,30 +76,74 @@ bool period_reg_tlm(void)
 
 void period_1Hz(uint32_t count)
 {
-//    if(count%3 == 0)
-//     motor_control.set(10);
-//     u0_dbg_printf("Set to left\n");
-//     //   motor_control.set();
-//     if((count % 7) == 0){
-// //       delay_ms(10);
-//        motor_control.set(5);
-//        u0_dbg_printf("Set to right\n");}
-//    C_period_1Hz(count);
+    C_period_1Hz(count);
 }
 
 void period_10Hz(uint32_t count)
 {
- //   C_period_10Hz(count);
+    static float motor_value = 15;
+    static float servo_value = 15;
+
+//    u0_dbg_printf("SW: %d\n", SW.getSwitchValues());
+
+    switch (SW.getSwitchValues()) {
+        case 1:
+        motor_value += 0.2;
+        motor_control->set(motor_value);
+
+        if(motor_value >= 16.6) {
+            motor_value = 16.6;
+        }
+        break;
+
+        case 2:
+            motor_value -= 0.2;
+        if(motor_value <= 15) {
+            motor_control->set(motor_value);
+            delay_ms(30);
+            motor_control->set(15);
+            delay_ms(30);
+            motor_control->set(motor_value);
+            if(motor_value <= 13.4) {
+                motor_value = 13.4;
+            }
+        }
+        u0_dbg_printf("Motor_value: %f\n", motor_value);
+        break;
+
+        case 4:
+        servo_value += 0.5;
+        servo_control->set(servo_value);
+
+        if(servo_value >= 19) {
+            servo_value = 19;
+        }
+        break;
+
+        case 8:
+        servo_value -= 0.5;
+        servo_control->set(servo_value);
+
+        if(servo_value <= 11.5) {
+            servo_value = 11.5;
+        }
+        break;
+
+        default:
+        //motor_control->set(motor_value);
+        servo_control->set(servo_value);
+    }
+    C_period_10Hz(count);
 }
 
 void period_100Hz(uint32_t count)
 {
-   // C_period_100Hz(count);
+    C_period_100Hz(count);
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():
 // scheduler_add_task(new periodicSchedulerTask(run_1Khz = true));
 void period_1000Hz(uint32_t count)
 {
-    //C_period_1000Hz(count);
+    C_period_1000Hz(count);
 }
