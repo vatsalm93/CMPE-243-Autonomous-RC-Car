@@ -17,7 +17,8 @@ public class BluetoothFragment extends Fragment {
 
 
     public BluetoothFragment() {
-        // Required empty public constructor
+        // Required empty
+        // public constructor
     }
 
 

@@ -8,13 +8,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,15 +23,17 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class BluetoothActivity extends AppCompatActivity {
+public class BluetoothActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     ListView listView;
     TextView statusTextView ;
-    Button searchButton,onButton,offButton;
+    Button searchButton,onOffButton;
     BluetoothAdapter bluetoothAdapter;
+    public DeviceListAdapter mDeviceListAdapter;
+    ListView lvNewDevices;
 
-    ArrayList<String> bluetoothDevices = new ArrayList<>();
-    ArrayList<String> addresses = new ArrayList<>();
-    ArrayAdapter arrayAdapter ;
+    ArrayList<BluetoothDevice> bluetoothDevices = new ArrayList<>();
+    //ArrayList<String> addresses = new ArrayList<>();
+    //ArrayAdapter arrayAdapter ;
     private static String TAG = "BluetoothActiviy";
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -43,22 +46,23 @@ public class BluetoothActivity extends AppCompatActivity {
                 searchButton.setEnabled(true);
             }else if(BluetoothDevice.ACTION_FOUND.equals(action)){
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE );
-                String name = device.getName();
-                String address = device.getAddress();
-                String rssi = Integer.toString( intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE));
-                Log.i(TAG, "Name: " + name + " Address: "+ address + " RSSI:" + rssi);
-                if(!addresses.contains(address)){
-                    addresses.add(address);
-                    String deviceString = "";
-                    if(name == null || name.equals("")){
-                        deviceString = address + " - RSSI " + rssi + "dBm";
-                    }
-                    else{
-                        deviceString = name + " - RSSI " + rssi + "dBm";
-                    }
-                    bluetoothDevices.add(deviceString);
-                    arrayAdapter.notifyDataSetChanged();
-                }
+                //String name = device.getName();
+                //String address = device.getAddress();
+                //String rssi = Integer.toString( intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE));
+                //Log.i(TAG, "Name: " + name + " Address: "+ address + " RSSI:" + rssi);
+//                if(!addresses.contains(address)){
+//                    addresses.add(address);
+//                    String deviceString = "";
+//                    if(name == null || name.equals("")){
+//                        deviceString = address + " - RSSI " + rssi + "dBm";
+//                    }
+//                    else{
+//                        deviceString = name + " - RSSI " + rssi + "dBm";
+//                    }
+                    bluetoothDevices.add(device);
+                    //arrayAdapter.notifyDataSetChanged();
+                    mDeviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, bluetoothDevices);
+                    lvNewDevices.setAdapter(mDeviceListAdapter);
             }
         }
     };
@@ -68,21 +72,22 @@ public class BluetoothActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
-        listView = findViewById(R.id.listView1);
+        lvNewDevices = (ListView) findViewById(R.id.lvNewDevices);
         statusTextView = findViewById(R.id.textView1);
         searchButton = findViewById(R.id.searchButton);
-        onButton = findViewById(R.id.turnOnButton);
-        offButton = findViewById(R.id.turnOffButton);
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bluetoothDevices);
+        onOffButton = findViewById(R.id.onOffButton);
+        bluetoothDevices = new ArrayList<>();
+        //arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bluetoothDevices);
 
-        listView.setAdapter(arrayAdapter);
+        //listView.setAdapter(arrayAdapter);
+        lvNewDevices.setOnItemClickListener(BluetoothActivity.this);
         int MY_PERMISSION_RESPONSE = 2;
         if (ContextCompat.checkSelfPermission(BluetoothActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(BluetoothActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},MY_PERMISSION_RESPONSE);
         }
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        IntentFilter intentFilter = new IntentFilter();
+        final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
         intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
@@ -90,30 +95,32 @@ public class BluetoothActivity extends AppCompatActivity {
 
         getApplicationContext().registerReceiver(broadcastReceiver, intentFilter);
 
-        if(bluetoothAdapter == null)
-        {
-            statusTextView.setText("Bluetooth is not available");
-        }
-        onButton.setOnClickListener(new View.OnClickListener() {
+        onOffButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(bluetoothAdapter == null)
+                {
+                    statusTextView.setText("Bluetooth is not available");
+                }
                 if (!bluetoothAdapter.isEnabled()) {
                     Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(turnOn, 0);
                     Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
+                    Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                    discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION,300);
+                    startActivity(discoverableIntent);
+
+                    IntentFilter BTintent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+                    registerReceiver(broadcastReceiver,BTintent);
                 }
-                else {
-                    Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+                if (bluetoothAdapter.isEnabled())
+                {
+                    bluetoothAdapter.disable();
+                    Toast.makeText(getApplicationContext(), "Turned off" ,Toast.LENGTH_LONG).show();
+                    IntentFilter BTintent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+                    registerReceiver(broadcastReceiver,BTintent);
                 }
 
-            }
-        });
-
-        offButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bluetoothAdapter.disable();
-                Toast.makeText(getApplicationContext(), "Turned off" ,Toast.LENGTH_LONG).show();
             }
         });
 
@@ -123,9 +130,23 @@ public class BluetoothActivity extends AppCompatActivity {
                 statusTextView.setText("Searching...");
                 searchButton.setEnabled(false);
                 bluetoothDevices.clear();
-                addresses.clear();
+                //addresses.clear();
                 bluetoothAdapter.startDiscovery();
             }
         });
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        bluetoothAdapter.cancelDiscovery();
+        Log.d(TAG,"Onclick item: You clicked on item");
+        String deviceName = bluetoothDevices.get(position).getName();
+        String deviceAddress = bluetoothDevices.get(position).getAddress();
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2){
+            Log.d(TAG, "Trying to pair with " + deviceName);
+            bluetoothDevices.get(position).createBond();
+            Toast.makeText(getApplicationContext(), "Connected to "+ deviceName,Toast.LENGTH_LONG).show();
+        }
+
     }
 }
