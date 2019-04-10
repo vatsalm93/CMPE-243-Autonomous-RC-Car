@@ -8,7 +8,7 @@ Step-2: Open "Final_PCB_Schematic.dch".
 
 Note: for header pin number refer "Pin_layout.docx". (This information should be adequate). I have given each module name in schematic. 
 
-Ask me if you don't get it.. Do not message on slack I hate that whatsapp or calls or in person.
+Ask me if you don't get it.. we can also discuss it on slack.
 
 If you guyz find any mistake in connection 
  
