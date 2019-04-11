@@ -35,6 +35,8 @@
 #include "lpc_pwm.hpp"
 #include "printf_lib.h"
 #include "utilities.h"
+#include "motor_can_rx.h"
+#include "motor_control.h"
 
 PWM *motor_control;
 PWM *servo_control;
@@ -52,8 +54,9 @@ const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 /// Called once before the RTOS is started, this is a good place to initialize things once
 bool period_init(void)
 {
-    motor_control = new PWM(PWM::pwm2, 100);
-    servo_control = new PWM(PWM::pwm3, 100);
+    motor_can_init();
+    motor_control = new PWM(PWM::pwm1, 100);
+    servo_control = new PWM(PWM::pwm2, 100);
 
     motor_control->set(15);
     servo_control->set(15);
@@ -81,57 +84,65 @@ void period_1Hz(uint32_t count)
 
 void period_10Hz(uint32_t count)
 {
-    static float motor_value = 15;
-    static float servo_value = 15;
+//    static float motor_value = 15;
+//    static float servo_value = 15;
+//
+////    u0_dbg_printf("SW: %d\n", SW.getSwitchValues());
+//
+//    switch (SW.getSwitchValues()) {
+//        case 1:
+//        motor_value += 0.2;
+//        motor_control->set(motor_value);
+//
+//        if(motor_value >= 16.6) {
+//            motor_value = 16.6;
+//        }
+//        break;
+//
+//        case 2:
+//            motor_value -= 0.2;
+//        if(motor_value <= 15) {
+//            motor_control->set(motor_value);
+//            delay_ms(30);
+//            motor_control->set(15);
+//            delay_ms(30);
+//            motor_control->set(motor_value);
+//            if(motor_value <= 13.4) {
+//                motor_value = 13.4;
+//            }
+//        }
+//        u0_dbg_printf("Motor_value: %f\n", motor_value);
+//        break;
+//
+//        case 4:
+//        servo_value += 0.5;
+//        servo_control->set(servo_value);
+//
+//        if(servo_value >= 19) {
+//            servo_value = 19;
+//        }
+//        break;
+//
+//        case 8:
+//        servo_value -= 0.5;
+//        servo_control->set(servo_value);
+//
+//        if(servo_value <= 11.5) {
+//            servo_value = 11.5;
+//        }
+//        break;
+//
+//        default:
+//        motor_control->set(motor_value);
+//        servo_control->set(servo_value);
+//    }
 
-//    u0_dbg_printf("SW: %d\n", SW.getSwitchValues());
+    rxstat_val setpwm = motor_pwm_process();
+    if(setpwm.can_rx_stat){
 
-    switch (SW.getSwitchValues()) {
-        case 1:
-        motor_value += 0.2;
-        motor_control->set(motor_value);
-
-        if(motor_value >= 16.6) {
-            motor_value = 16.6;
-        }
-        break;
-
-        case 2:
-            motor_value -= 0.2;
-        if(motor_value <= 15) {
-            motor_control->set(motor_value);
-            delay_ms(30);
-            motor_control->set(15);
-            delay_ms(30);
-            motor_control->set(motor_value);
-            if(motor_value <= 13.4) {
-                motor_value = 13.4;
-            }
-        }
-        u0_dbg_printf("Motor_value: %f\n", motor_value);
-        break;
-
-        case 4:
-        servo_value += 0.5;
-        servo_control->set(servo_value);
-
-        if(servo_value >= 19) {
-            servo_value = 19;
-        }
-        break;
-
-        case 8:
-        servo_value -= 0.5;
-        servo_control->set(servo_value);
-
-        if(servo_value <= 11.5) {
-            servo_value = 11.5;
-        }
-        break;
-
-        default:
-        //motor_control->set(motor_value);
-        servo_control->set(servo_value);
+        motor_control->set(setpwm.motor_pwm_value);
+        servo_control->set(setpwm.servo_pwm_value);
+        u0_dbg_printf("motor: %f servo: %f\n", setpwm.motor_pwm_value, setpwm.servo_pwm_value);
     }
     C_period_10Hz(count);
 }
@@ -145,5 +156,6 @@ void period_100Hz(uint32_t count)
 // scheduler_add_task(new periodicSchedulerTask(run_1Khz = true));
 void period_1000Hz(uint32_t count)
 {
+    motor_can_reset_busoff();
     C_period_1000Hz(count);
 }
