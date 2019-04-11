@@ -4,9 +4,9 @@
     <item android:title="Bluetooth">
         <menu>
             <item
-                android:id="@+id/scan_id"
+                android:id="@+id/bt_func"
                 android:icon="@drawable/bt_icon"
-                android:title="Scan Devices"></item>
+                android:title="Bluetooth Configuration"></item>
         </menu>
     </item>
 </menu>

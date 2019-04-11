@@ -8,6 +8,7 @@
     <string name="search_devices">Search Devices</string>
     <string name="turn_on">ON/OFF</string>
     <string name="turn_off">Turn OFF</string>
+    <string name="bt_name">Simple Bluetooth</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Bluetooth Configuration</string>

@@ -3,7 +3,6 @@ package com.example.techsavvy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -18,7 +17,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextMessage;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    private FragmentTransaction fragmentTransaction;
     private NavigationView navigationView;
     private static final String TAG = "MainActivity";
 
@@ -42,26 +40,14 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch(item.getItemId())
                 {
-                    case R.id.scan_id:
+                    case R.id.bt_func:
                         Log.i(TAG, "Menu item clicked " + item.toString());
-//                        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-//                        fragmentTransaction.replace(R.id.main_container,new BluetoothFragment());
-//                        fragmentTransaction.commit();
-//                        getSupportActionBar().setTitle("Bluetooth Configuration");
-//                        item.setChecked(true);
-//                        drawerLayout.closeDrawers();
-                          Intent intent = new Intent(getBaseContext(), BluetoothActivity.class);
-                          startActivity(intent);
+                        Intent intent2 = new Intent(getBaseContext(), Bluetooth.class);
+                        startActivity(intent2);
                 }
                 return false;
             }
         });
-
-
-
-        //mTextMessage = (TextView) findViewById(R.id.message);
-        //BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        //navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
     @Override
