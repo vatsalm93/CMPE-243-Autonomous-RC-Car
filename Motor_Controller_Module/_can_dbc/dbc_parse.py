@@ -517,7 +517,7 @@ class DBC(object):
         code = ''
         code += ("/// DBC file: %s    Self node: '%s'  (ALL = %u)\n" % (self.name, self.self_node, self.gen_all))
         code += ("/// This file can be included by a source file, for example: #include \"generated.h\"\n")
-        code += ("#ifndef __GENEARTED_DBC_PARSER\n")
+        code += ("#ifndef __GENERATED_DBC_PARSER\n")
         code += ("#define __GENERATED_DBC_PARSER\n")
         code += ("#include <stdbool.h>\n")
         code += ("#include <stdint.h>\n")
