@@ -15,6 +15,7 @@ import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -46,7 +47,8 @@ public class Bluetooth extends AppCompatActivity {
     private Set<BluetoothDevice> mPairedDevices;
     private ArrayAdapter<String> mBTArrayAdapter;
     private ListView mDevicesListView;
-    private CheckBox mLED1;
+    private CheckBox mStart;
+    private CheckBox mStop;
 
     private final String TAG = MainActivity.class.getSimpleName();
     private Handler mHandler; // Our main handler that will receive callback notifications
@@ -65,6 +67,9 @@ public class Bluetooth extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth2);
+        Toolbar toolbar = findViewById(R.id.toolbar_bt);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
                 mBluetoothStatus = (TextView)findViewById(R.id.bluetoothStatus);
@@ -73,7 +78,8 @@ public class Bluetooth extends AppCompatActivity {
                 mOffBtn = (Button)findViewById(R.id.off);
                 mDiscoverBtn = (Button)findViewById(R.id.discover);
                 mListPairedDevicesBtn = (Button)findViewById(R.id.PairedBtn);
-                mLED1 = (CheckBox)findViewById(R.id.checkboxLED1);
+                mStart = (CheckBox)findViewById(R.id.start);
+                mStop = (CheckBox)findViewById(R.id.stop);
 
                 mBTArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
                 mBTAdapter = BluetoothAdapter.getDefaultAdapter(); // get a handle on the bluetooth radio
@@ -115,11 +121,18 @@ public class Bluetooth extends AppCompatActivity {
                 }
                 else {
 
-                    mLED1.setOnClickListener(new View.OnClickListener(){
+                    mStart.setOnClickListener(new View.OnClickListener(){
                         @Override
                         public void onClick(View v){
                             if(mConnectedThread != null) //First check to make sure thread created
                                 mConnectedThread.write("1");
+                        }
+                    });
+                    mStop.setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View v){
+                            if(mConnectedThread != null) //First check to make sure thread created
+                                mConnectedThread.write("0");
                         }
                     });
 
