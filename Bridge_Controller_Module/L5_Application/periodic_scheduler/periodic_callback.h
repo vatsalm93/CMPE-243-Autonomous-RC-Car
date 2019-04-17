@@ -27,8 +27,6 @@ extern "C" {
 #endif
 
 
-#include "can_code/can_tx.h"
-
 /// @{ @see period_callbacks.cpp for more info
 extern const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES;
 extern const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES;

@@ -9,8 +9,9 @@
 #include <Bridge_Module/ble_hc05.h>
 #include <stdio.h>
 #include "c_uart2.h"
-#include "c_io.h"
 #include "c_uart_dev.h"
+#include "c_io.h"
+#include <can_code/CAN_Communication.h>
 
 ble_msg_t ble_param = {0};
 
@@ -21,8 +22,8 @@ void BLE_init()
 
     printf("\r\nHC-05 Version:%s\r\n",FIRMWARE_VERSION);
     // Default Values for now
-    ble_param.latitude = "37.121356,";
-    ble_param.longitude = "-121.121356";
+    ble_param.latitude = "Lat:37.121356 ";
+    ble_param.longitude = "Long:-121.121356 ";
 }
 
 void BLE_rx()
@@ -30,9 +31,22 @@ void BLE_rx()
     while(cgetChar(&ble_param.getdata,0))
      {
         setLED(2,1);
-        setLCD_Display(ble_param.getdata);
+        //setLCD_Display(ble_param.getdata);
         if ('\r' != ble_param.getdata && '\n' != ble_param.getdata) {
             printf("%c",ble_param.getdata);
+        }
+        if(ble_param.getdata == '1')
+        {
+            CAN_Transmit(START_CMD);
+            setLED(3,1);
+            ble_param.getdata = CONTINUE_CMD;
+        }
+        if(ble_param.getdata == '0')
+
+        {
+            CAN_Transmit(STOP_CMD);
+            setLED(3,0);
+            ble_param.getdata = CONTINUE_CMD;
         }
       }
 }
