@@ -21,6 +21,12 @@ extern "C" {
 void BLE_init();
 void check_for_data_on_ble();
 
+enum dataFromApp {
+    STOP_CMD = 0,
+    START_CMD = 1,
+    CONTINUE_CMD = 2
+};
+
 /**
  *
  */

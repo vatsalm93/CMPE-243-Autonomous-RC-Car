@@ -32,6 +32,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "periodic_callback.h"
+#include <can_code/CAN_Communication.h>
 
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
 const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
@@ -50,6 +51,7 @@ const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 bool period_init(void)
 {
     BLE_init();
+    CAN_Init_w();
     return true;                // Must return true upon success
 }
 
@@ -67,6 +69,8 @@ bool period_reg_tlm(void)
  */
 void period_1Hz(uint32_t count) //1000ms
 {
+    transmit_heartbeat_on_can();
+    CANresetAfterBusOff();
 }
 
 /**
@@ -76,6 +80,7 @@ void period_1Hz(uint32_t count) //1000ms
 void period_10Hz(uint32_t count) //100ms
 {
    check_for_data_on_ble();
+   CAN_Recieve();
 }
 
 void period_100Hz(uint32_t count) //10ms
