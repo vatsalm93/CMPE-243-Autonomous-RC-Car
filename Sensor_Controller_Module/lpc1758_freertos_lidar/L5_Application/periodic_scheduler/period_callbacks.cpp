@@ -31,8 +31,12 @@
 #include <stdint.h>
 #include "periodic_callback.h"
 //#include "c_code/c_can.h"
+#include "Lidar_includes/ultrasonic_sensor.h"
 #include <stdio.h>
-#include "Sensor_CAN_Interfacing.h"
+#include "Lidar_includes/Sensor_CAN_Interfacing.h"
+#include "Lidar_includes/LidarTask.h"
+
+Lidar lidar_obj;
 
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
 const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
@@ -50,7 +54,8 @@ const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 bool period_init(void)
 {
     sensor_can_init();
-
+    sensor_cntlr_init();
+  //  lidar_obj.Lidar_init();
     //    return c_period_init(); // Must return true upon success
     return true;
 }
@@ -70,16 +75,17 @@ bool period_reg_tlm(void)
 void period_1Hz(uint32_t count)
 {
     sensor_CAN_turn_on_bus_if_bus_off();
+    transmit_heartbeat_on_can();
 }
 
 void period_10Hz(uint32_t count)
 {
-
+//    sensor_send_data();
 }
 
 void period_100Hz(uint32_t count)
 {
-
+//    sensor_send_data();
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():

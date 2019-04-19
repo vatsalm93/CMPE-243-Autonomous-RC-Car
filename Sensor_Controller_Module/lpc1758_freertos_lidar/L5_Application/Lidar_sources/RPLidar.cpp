@@ -30,10 +30,12 @@
 #include <stddef.h>
 #include "lpc_sys.h"
 #include "utilities.h"
-#include "RPLidar.h"
+#include "Lidar_includes/RPLidar.h"
 #include "printf_lib.h"
+#include "_can_dbc/generated_can.h"
 
-#define distance_range 25.0
+#define distance_range 250.0
+SENSOR_NODE_t sensor_cmd;
 
 // ask the RPLIDAR for its health info
 uint32_t RPLidar::getHealth(rplidar_response_device_health_t & healthinfo, uint32_t timeout)
@@ -288,119 +290,52 @@ uint32_t RPLidar::waitPoint(rplidar_response_measurement_node_t *node, uint32_t 
 int RPLidar::divideDistance(float distance)
 {
     int track;
-    if(distance > 27 && distance<= distance_range*2 ){
-            track = 1;
-        }
-        else if(distance > distance_range*2 && distance <= distance_range*3){
-            track = 2;
-        }
-        else if(distance > distance_range*3 && distance <= distance_range*4){
-            track = 3;
-        }
-        else if(distance > distance_range*4 && distance <= distance_range*5){
-            track = 4;
-        }
-        else if(distance > distance_range*5 && distance <= distance_range*6){
-            track = 5;
-        }
-        else if(distance > distance_range*6 && distance <= distance_range*7){
-            track = 6;
-        }
-        else if(distance > distance_range*7 && distance <= distance_range*8){
-              track = 7;
-        }
-        else{
-            track = 0;
-        }
-        return track;
+    if (distance > 0 && distance <= distance_range) {
+        track = 1;
+    }
+    else if (distance > distance_range && distance <= distance_range * 2) {
+        track = 2;
+    }
+    else if (distance > distance_range * 2 && distance <= distance_range * 3) {
+        track = 3;
+    }
+    else if (distance > distance_range * 3 && distance <= distance_range * 4) {
+        track = 4;
+    }
+    else {
+        track = 0;
+    }
+    //u0_dbg_printf("track selected %d\n", track);
+    return track;
 }
-uint32_t RPLidar::divideAngle(RPLidarMeasurement *angle_value,int length, store_SECTION_value *identify_section)
+void RPLidar::divideAngle(RPLidarMeasurement *angle_value, int length)
 {
-    int check_track = 0;
     int store_angle = 0;
 
-    for(int i=0; i<8; i++)
-    {
-    store_angle = angle_value[i].angle;
-    if(store_angle > 360 || store_angle < 0 )
-    {
-        return RESULT_INVALID_DATA;
-    }
-    else
-    {
-        switch(store_angle)
-        {
-        case 0 ... SECTION0:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section0 = check_track;
-            u0_dbg_printf("in section 0 %d %d\n",check_track,identify_section->section0);
-            break;
-        }
-        case SECTION0+1 ... SECTION1:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section1 = check_track;
-           // u0_dbg_printf("in section 1 %d\n",check_track);
+    for (int i = 0; i < length; i++) {
+        store_angle = angle_value->angle;
 
-            break;
+            switch (store_angle) {
+                case Obstacle_FRONT0_start_range ... Obstacle_FRONT0_end_range: {
+                    sensor_cmd.LIDAR_Obstacle_FRONT = divideDistance(angle_value->distance);
+                    break;
+                }
+                case Obstacle_FRONT1_start_range ... Obstacle_FRONT1_end_range: {
+                    sensor_cmd.LIDAR_Obstacle_FRONT = divideDistance(angle_value->distance);
+                    break;
+                }
+                case Obstacle_RIGHT_start_range ... Obstacle_RIGHT_end_range: {
+                    sensor_cmd.LIDAR_Obstacle_RIGHT = divideDistance(angle_value->distance);
+                    break;
+                }
+                case Obstacle_LEFT_start_range ... Obstacle_LEFT_end_range: {
+                    sensor_cmd.LIDAR_Obstacle_LEFT = divideDistance(angle_value->distance);
+                    break;
+                }
+                case Obstacle_BACK_start_range ... Obstacle_BACK_end_range: {
+                    sensor_cmd.LIDAR_Obstacle_BACK = divideDistance(angle_value->distance);
+                    break;
+                }
         }
-        case SECTION1+1 ... SECTION2:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section2 = check_track;
-            break;
-        }
-        case SECTION2+1 ... SECTION3:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section3 = check_track;
-            break;
-        }
-        case SECTION3+1 ... SECTION4:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section4 = check_track;
-            break;
-        }
-        case SECTION4+1 ... SECTION5:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section5 = check_track;
-            break;
-        }
-        case SECTION5+1 ... SECTION6:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section6 = check_track;
-            break;
-        }
-        case SECTION6+1 ... SECTION7:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section7 = check_track;
-            break;
-        }
-        case SECTION7+1 ... SECTION8:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section8 = check_track;
-            break;
-        }
-        case SECTION8+1 ... SECTION9:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section9 = check_track;
-            break;
-        }
-        case SECTION9+1 ... SECTION10:
-        {
-            check_track = divideDistance(angle_value->distance);
-            identify_section->section10 = check_track;
-            break;
-        }
-        }
-        return RESULT_OK;
-    }
     }
 }

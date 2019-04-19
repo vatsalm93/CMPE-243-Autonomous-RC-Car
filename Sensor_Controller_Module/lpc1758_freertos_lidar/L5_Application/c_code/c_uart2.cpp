@@ -24,4 +24,5 @@ bool uart2_get_char(char* pInputChar,uint32_t timeout_ms) {
 bool uart2_put_char(char out, uint32_t timeout_ms)
 {
     u->putChar(out,timeout_ms);
+    return true;
 }

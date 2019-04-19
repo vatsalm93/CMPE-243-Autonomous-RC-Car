@@ -25,7 +25,7 @@
  */
 #include "tasks.hpp"
 #include "examples/examples.hpp"
-#include "LidarTask_create.h"
+#include "Lidar_includes/LidarTask_create.h"
 
 /**
  * The main() creates tasks or "threads".  See the documentation of scheduler_task class at scheduler_task.hpp
@@ -44,7 +44,6 @@
 
 int main(void)
 {
-
     /**
      * A few basic tasks for this bare-bone system :
      *      1.  Terminal task provides gateway to interact with the board through UART terminal.

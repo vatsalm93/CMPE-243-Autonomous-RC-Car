@@ -6,16 +6,17 @@
  */
 
 
-#include "LidarTask.h"
-#include "Sensor_CAN_Interfacing.h"
+#include "Lidar_includes/LidarTask.h"
+#include "Lidar_includes/Sensor_CAN_Interfacing.h"
+#include "c_code/c_io.h"
+#include "c_code/c_pwm.h"
 
-PWM pwm2(PWM::pwm4, 25000);
+PWM pwm2(PWM::pwm6, 100);
 RPLidar lidar;
 
 static rplidar_response_measurement_node_t raw_response_node;
 static RPLidarMeasurement refined_response_buff[360];
 static RPLidarMeasurement refined_response;
-static store_SECTION_value section_value_to_send;
 
 bool Lidar::Lidar_init()
 {
@@ -45,36 +46,28 @@ bool Lidar::Lidar_init()
 void Lidar::Lidar_get_data()
 {
     static int count = 0;
-        count++;
-        for(int i=0;i<360;i++)
-        {
-            memset(&(refined_response_buff[i]), 0, sizeof(RPLidarMeasurement));
-            if(IS_OK(lidar.waitPoint(&raw_response_node, lidar.RPLIDAR_DEFAULT_TIMEOUT, &refined_response)))
-                refined_response_buff[i] = refined_response;
-            //u0_dbg_printf("buffer value %x\n",&refined_response_buff[i]);
-        }
-
-        if(count%10 == 0)
-        {
-            xQueueReset(lidar.uart2.getRxQueue());
-            count = 0;
-        }
+    count++;
+    for(int i=0;i<360;i++)
+    {
+        memset(&(refined_response_buff[i]), 0, sizeof(RPLidarMeasurement));
+        if(IS_OK(lidar.waitPoint(&raw_response_node, lidar.RPLIDAR_DEFAULT_TIMEOUT, &refined_response)))
+            refined_response_buff[i] = refined_response;
+    }
+    if(count%10 == 0)
+    {
+        xQueueReset(lidar.uart2.getRxQueue());
+        count = 0;
+    }
 }
 
 void Lidar::Lidar_parse_data()
 {
    int length_of_buffer = sizeof(refined_response_buff)/sizeof(refined_response_buff[0]);
-
-   lidar.divideAngle(&refined_response_buff[0],length_of_buffer,&section_value_to_send);
+   lidar.divideAngle(refined_response_buff,length_of_buffer);
 }
 
 void Lidar::Lidar_send_data_CAN()
 {
-//    u0_dbg_printf("section 0 : %x\n",section_value_to_send.section0);
-//    u0_dbg_printf("section 1 : %x\n",section_value_to_send.section1);
-//    u0_dbg_printf("section 2 : %x\n",section_value_to_send.section2);
-//    u0_dbg_printf("section 3 : %x\n",section_value_to_send.section3);
-
-    // System is crashing in below function call
+    //u0_dbg_printf(",%d",sensor_send_data());
     sensor_send_data();
 }

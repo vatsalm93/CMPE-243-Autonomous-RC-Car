@@ -43,18 +43,16 @@
 //-----------------------------------------
 
 //DIVIDE INTO ANGLES
-#define SECTION0 20
-#define SECTION1 40
-#define SECTION2 60
-#define SECTION3 80
-#define SECTION4 100
-
-#define SECTION5 260
-#define SECTION6 280
-#define SECTION7 300
-#define SECTION8 320
-#define SECTION9 340
-#define SECTION10 360
+#define Obstacle_FRONT0_start_range 0
+#define Obstacle_FRONT0_end_range 30
+#define Obstacle_FRONT1_start_range 330
+#define Obstacle_FRONT1_end_range 359
+#define Obstacle_RIGHT_start_range 31
+#define Obstacle_RIGHT_end_range 75
+#define Obstacle_LEFT_end_range 329
+#define Obstacle_LEFT_start_range 285
+#define Obstacle_BACK_start_range 135
+#define Obstacle_BACK_end_range 225
 
 // Commands without payload and response
 #define RPLIDAR_CMD_STOP               0x25
@@ -62,6 +60,8 @@
 #define RPLIDAR_CMD_FORCE_SCAN         0x21
 #define RPLIDAR_CMD_RESET              0x40
 
+//#define RPLIDAR_SERIAL_BAUDRATE 115200;
+//#define RPLIDAR_DEFAULT_TIMEOUT 500;
 
 // Commands without payload but have response
 #define RPLIDAR_CMD_GET_DEVICE_INFO      0x50
@@ -106,6 +106,7 @@ typedef struct _rplidar_response_device_health_t {
     uint8_t   status;
     uint16_t  error_code;
 } __attribute__((packed)) rplidar_response_device_health_t;
+
 
 #if defined(_WIN32)
 #pragma pack()

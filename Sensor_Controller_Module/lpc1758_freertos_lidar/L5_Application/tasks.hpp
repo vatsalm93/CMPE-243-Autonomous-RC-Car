@@ -28,7 +28,7 @@
 #include "command_handler.hpp"
 #include "wireless.h"
 #include "char_dev.hpp"
-#include "LidarTask.h"
+#include "Lidar_includes/LidarTask.h"
 
 #include "FreeRTOS.h"
 #include "semphr.h"
