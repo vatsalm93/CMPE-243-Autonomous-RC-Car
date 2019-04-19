@@ -12,6 +12,14 @@ typedef struct
     bool  startBit;
 }RPLidarMeasurement;
 
+typedef struct
+{
+    int sector_front;
+    int sector_front_left;
+    int sector_front_right;
+    int sector_rear;
+}RPLidarRotation;
+
 class RPLidar
 {
     public:
@@ -46,7 +54,7 @@ class RPLidar
     }
 
     int divideDistance(float distance);
-    void divideAngle(RPLidarMeasurement *angle_value,int length);
+    void divideAngle(RPLidarMeasurement *angle_value,int length, RPLidarRotation *rot);
 
 protected:
     uint32_t _sendCommand(uint8_t cmd, const void * payload, size_t payloadsize);

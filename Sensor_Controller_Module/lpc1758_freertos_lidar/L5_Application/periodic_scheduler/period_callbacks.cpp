@@ -54,7 +54,7 @@ const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 bool period_init(void)
 {
     sensor_can_init();
-    sensor_cntlr_init();
+//    sensor_cntlr_init();
   //  lidar_obj.Lidar_init();
     //    return c_period_init(); // Must return true upon success
     return true;
@@ -80,12 +80,12 @@ void period_1Hz(uint32_t count)
 
 void period_10Hz(uint32_t count)
 {
-//    sensor_send_data();
+
 }
 
 void period_100Hz(uint32_t count)
 {
-//    sensor_send_data();
+
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():

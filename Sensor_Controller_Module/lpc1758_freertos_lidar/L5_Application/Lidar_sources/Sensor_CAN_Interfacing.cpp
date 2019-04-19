@@ -26,46 +26,41 @@ extern sensor_lv_max_sonar_t send_ultrasonic_data;
 bool sensor_can_init()
 {
     bool status = false;
-       do {
-           status = CAN_init(SENSOR_CAN_BUS, SENSOR_BAUD_RATE, SENSOR_RX_Q, SENSOR_TX_Q, 0, 0);
-       } while (status == false);
+    do {
+        status = CAN_init(SENSOR_CAN_BUS, SENSOR_BAUD_RATE, SENSOR_RX_Q, SENSOR_TX_Q, 0, 0);
+    } while (status == false);
 
-       CAN_reset_bus(SENSOR_CAN_BUS);
+    CAN_reset_bus(SENSOR_CAN_BUS);
 
-       u0_dbg_printf("can init return %d \n",status);
-       return status;
+    u0_dbg_printf("can init return %d \n",status);
+    return status;
 }
 
 bool sensor_send_data(void)
 {
-   sensor_cmd.SENSOR_FRONT_cm = send_ultrasonic_data.distance;
-   can_msg_t can_msg = {0};
-   u0_dbg_printf("sensor data %x\n",sensor_cmd);
-   dbc_msg_hdr_t can_msg_hdr = dbc_encode_SENSOR_NODE(can_msg.data.bytes, &sensor_cmd);
-   can_msg.msg_id = can_msg_hdr.mid;
-   can_msg.frame_fields.data_len = can_msg_hdr.dlc;
-
-   for (int i = 0; i < can_msg.frame_fields.data_len; i++) {
-       u0_dbg_printf("%#2X, ", can_msg.data.bytes[i]);
-           }
-
-   return (CAN_tx(SENSOR_CAN_BUS, &can_msg, 0));
+    sensor_cmd.SENSOR_FRONT_cm = send_ultrasonic_data.distance;
+    can_msg_t can_msg = {0};
+    u0_dbg_printf("sensor data %x\n",sensor_cmd);
+    dbc_msg_hdr_t can_msg_hdr = dbc_encode_SENSOR_NODE(can_msg.data.bytes, &sensor_cmd);
+    can_msg.msg_id = can_msg_hdr.mid;
+    can_msg.frame_fields.data_len = can_msg_hdr.dlc;
+    return (CAN_tx(SENSOR_CAN_BUS, &can_msg, 0));
 }
 
 bool transmit_heartbeat_on_can(void)
 {
     SENSOR_HEARTBEAT_t heartbeat_msg = {0};
-   can_msg_t can_msg = { 0 };
+    can_msg_t can_msg = { 0 };
 
-   heartbeat_msg.SENSOR_hbt = 1;
+    heartbeat_msg.SENSOR_hbt = 1;
 
-   dbc_msg_hdr_t msg_hdr = dbc_encode_SENSOR_HEARTBEAT(can_msg.data.bytes, &heartbeat_msg);
-   can_msg.msg_id = msg_hdr.mid;
-   can_msg.frame_fields.data_len = msg_hdr.dlc;
+    dbc_msg_hdr_t msg_hdr = dbc_encode_SENSOR_HEARTBEAT(can_msg.data.bytes, &heartbeat_msg);
+    can_msg.msg_id = msg_hdr.mid;
+    can_msg.frame_fields.data_len = msg_hdr.dlc;
 
-   setLED(4,1);
-   // Queue the CAN message to be sent out
-   return (CAN_tx(can1, &can_msg, 0));
+    setLED(4,1);
+    // Queue the CAN message to be sent out
+    return (CAN_tx(can1, &can_msg, 0));
 }
 
 bool sensor_CAN_turn_on_bus_if_bus_off()

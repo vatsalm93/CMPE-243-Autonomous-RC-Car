@@ -18,7 +18,7 @@ LidarTask::LidarTask(uint8_t priority):scheduler_task("LidarTask", 2000, priorit
 bool LidarTask::init()
 {
     lidar_obj.Lidar_init();
-  //  sensor_cntlr_init();
+    sensor_cntlr_init();
     return true;
 }
 

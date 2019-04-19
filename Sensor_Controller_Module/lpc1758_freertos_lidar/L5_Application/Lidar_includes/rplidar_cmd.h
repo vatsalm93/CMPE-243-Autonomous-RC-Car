@@ -43,16 +43,16 @@
 //-----------------------------------------
 
 //DIVIDE INTO ANGLES
-#define Obstacle_FRONT0_start_range 0
-#define Obstacle_FRONT0_end_range 30
-#define Obstacle_FRONT1_start_range 330
-#define Obstacle_FRONT1_end_range 359
-#define Obstacle_RIGHT_start_range 31
-#define Obstacle_RIGHT_end_range 75
-#define Obstacle_LEFT_end_range 329
-#define Obstacle_LEFT_start_range 285
-#define Obstacle_BACK_start_range 135
-#define Obstacle_BACK_end_range 225
+#define Obstacle_FRONT0_start_range 345
+#define Obstacle_FRONT0_end_range 359
+#define Obstacle_FRONT1_start_range 0
+#define Obstacle_FRONT1_end_range 15
+#define Obstacle_RIGHT_start_range 15
+#define Obstacle_RIGHT_end_range 45
+#define Obstacle_LEFT_start_range 315
+#define Obstacle_LEFT_end_range 345
+#define Obstacle_BACK_start_range 165
+#define Obstacle_BACK_end_range 195
 
 // Commands without payload and response
 #define RPLIDAR_CMD_STOP               0x25
