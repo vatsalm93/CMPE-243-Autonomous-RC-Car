@@ -55,7 +55,7 @@ static inline LPC_TIM_TypeDef* lpc_timer_get_struct(const lpc_timer_t timer)
 }
 
 /**
- * @returns the timer ISR number based ont he timer parameter
+ * @returns the timer ISR number based on the timer parameter
  */
 static inline IRQn_Type lpc_timer_get_irq_num(const lpc_timer_t timer)
 {

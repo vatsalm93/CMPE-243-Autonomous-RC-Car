@@ -10,7 +10,7 @@
 
 #include "motor_can_rx.h"
 #include "c_pwm.h"
-//#include "utilities.h"
+#include "utilities.h"
 #include "generated_can.h"
 
 #ifdef __cplusplus

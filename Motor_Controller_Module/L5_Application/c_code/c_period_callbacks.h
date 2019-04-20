@@ -19,6 +19,7 @@ void C_period_1Hz(uint32_t count);
 void C_period_10Hz(uint32_t count);
 void C_period_100Hz(uint32_t count);
 void C_period_1000Hz(uint32_t count);
+void eint3_handler(void);
 
 #ifdef __cplusplus
 }

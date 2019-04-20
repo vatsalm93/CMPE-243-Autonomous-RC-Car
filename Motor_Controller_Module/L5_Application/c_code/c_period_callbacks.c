@@ -14,12 +14,24 @@
 #include "utilities.h"
 #include "c_code/motor_can_rx.h"
 #include "c_code/motor_control.h"
+#include "speed_calculator.h"
+#include "eint.h"
+#include "c_io.h"
+#include "c_gpio.h"
+
+//void_func_t *ptr = eint3_handler;
 
 bool C_period_init(void) {
+
+    setLED(1, 0);
+    eint3_enable_port2(6, eint_falling_edge, eint3_handler);
     motor_can_init();
     init_pwm(100);
     set_pwm_value(motor_1, 15);
     set_pwm_value(servo_2, 15);
+    setPin();
+    setInput();
+
     return true;
 }
 bool C_period_reg_tlm(void) {
@@ -32,20 +44,19 @@ void C_period_1Hz(uint32_t count) {
 }
 
 void C_period_10Hz(uint32_t count) {
+    motor_pwm_process();
     (void) count;
 }
 
 void C_period_100Hz(uint32_t count) {
     (void) count;
-    motor_pwm_process();
-//        if(setpwm.can_rx_stat){
-//            set_pwm_value(motor_1, setpwm.motor_pwm_value);
-//            set_pwm_value(servo_2, setpwm.servo_pwm_value);
-//            u0_dbg_printf("motor: %f servo: %f\n", setpwm.motor_pwm_value, setpwm.servo_pwm_value);
-//        }
+ //   if(!read_pin())
+ //   u0_dbg_printf("Value: %d\n", read_pin());
+    C_period_10Hz(count);
 }
 
 void C_period_1000Hz(uint32_t count) {
     (void) count;
     motor_can_reset_busoff();
 }
+

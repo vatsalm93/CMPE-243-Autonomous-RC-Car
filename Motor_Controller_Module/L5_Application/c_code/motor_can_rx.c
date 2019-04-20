@@ -39,11 +39,14 @@ bool motor_can_rx(CAR_CONTROL_t *drive)
         can_msg_hdr.mid = can_motor_msg.msg_id;
         if(105 == can_motor_msg.msg_id){
             dbc_decode_CAR_CONTROL(drive, can_motor_msg.data.bytes, &can_msg_hdr);
+            setLED(1, 0);
 //            u0_dbg_printf("motor_encode: %d, motor_decode: %d, servo_decode: %d\n",
 //                           can_motor_msg.data.bytes[0], drive->MOTOR_DRIVE_cmd, drive->MOTOR_STEER_cmd);
         }
         motor_rx_flag = true;
     }
+    if(dbc_handle_mia_CAR_CONTROL(drive, 100))
+        setLED(1, 1);
         return motor_rx_flag;
 }
 //

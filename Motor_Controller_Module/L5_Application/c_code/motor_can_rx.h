@@ -9,6 +9,7 @@
 #define C_CAN_H_
 
 #include "can.h"
+#include "c_io.h"
 #include "generated_can.h"
 
 #ifdef __cplusplus
