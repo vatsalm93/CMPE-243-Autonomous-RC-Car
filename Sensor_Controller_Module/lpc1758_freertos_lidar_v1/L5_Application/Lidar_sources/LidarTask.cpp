@@ -32,8 +32,8 @@ bool Lidar::Lidar_init()
     pwm2.set(0);
     pwm2.set(100);
     uint32_t result = lidar.startScan(0,lidar.RPLIDAR_DEFAULT_TIMEOUT);
-    u0_dbg_printf("LIDAR start scan success\n");
-    u0_dbg_printf("scan returned result %x\n,result");
+//    u0_dbg_printf("LIDAR start scan success\n");
+//    u0_dbg_printf("scan returned result %x\n,result");
     if(!IS_OK(result))
     {
         u0_dbg_printf("scanned timed out\n");
@@ -49,7 +49,6 @@ void Lidar::Lidar_get_data()
     memset(refined_response_buff, 0, sizeof(refined_response_buff));
     for(int i=0;i<360;i++)
     {
-//        memset(&(refined_response_buff[i]), 0, sizeof(RPLidarMeasurement));
         if(IS_OK(lidar.waitPoint(&raw_response_node, lidar.RPLIDAR_DEFAULT_TIMEOUT, &refined_response)))
             refined_response_buff[i] = refined_response;
     }

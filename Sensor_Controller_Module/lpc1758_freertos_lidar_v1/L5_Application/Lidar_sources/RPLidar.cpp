@@ -334,7 +334,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *angle_value, int length, RPLidarRo
         {
             store_angle = angle_value[i].angle;
             store_distance = angle_value[i].distance;
-            if (((store_angle > Obstacle_FRONT0_start_range) && (store_angle < Obstacle_FRONT0_end_range))
+            if (((store_angle > Obstacle_FRONT0_start_range) && (store_angle <= Obstacle_FRONT0_end_range))
                     || ((store_angle >= Obstacle_FRONT1_start_range) && (store_angle <= Obstacle_FRONT1_end_range)))
             {
                 track = divideDistance(store_distance);

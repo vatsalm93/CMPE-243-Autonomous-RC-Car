@@ -43,25 +43,33 @@
 //-----------------------------------------
 
 //DIVIDE INTO ANGLES
-#define Obstacle_FRONT0_start_range 345
-#define Obstacle_FRONT0_end_range 359
-#define Obstacle_FRONT1_start_range 0
-#define Obstacle_FRONT1_end_range 15
-#define Obstacle_RIGHT_start_range 15
-#define Obstacle_RIGHT_end_range 45
-#define Obstacle_LEFT_start_range 315
-#define Obstacle_LEFT_end_range 345
-#define Obstacle_BACK_start_range 165
-#define Obstacle_BACK_end_range 195
+//#define Obstacle_FRONT0_start_range 340
+//#define Obstacle_FRONT0_end_range 359
+//#define Obstacle_FRONT1_start_range 0
+//#define Obstacle_FRONT1_end_range 15
+//#define Obstacle_RIGHT_start_range 15
+//#define Obstacle_RIGHT_end_range 45
+//#define Obstacle_LEFT_start_range 285
+//#define Obstacle_LEFT_end_range 340
+//#define Obstacle_BACK_start_range 165
+//#define Obstacle_BACK_end_range 195
+
+#define Obstacle_FRONT0_start_range 0
+#define Obstacle_FRONT0_end_range 5
+#define Obstacle_FRONT1_start_range 335
+#define Obstacle_FRONT1_end_range 359
+#define Obstacle_RIGHT_start_range 5
+#define Obstacle_RIGHT_end_range 50
+#define Obstacle_LEFT_start_range 290
+#define Obstacle_LEFT_end_range 335
+#define Obstacle_BACK_start_range 140
+#define Obstacle_BACK_end_range 200
 
 // Commands without payload and response
 #define RPLIDAR_CMD_STOP               0x25
 #define RPLIDAR_CMD_SCAN               0x20
 #define RPLIDAR_CMD_FORCE_SCAN         0x21
 #define RPLIDAR_CMD_RESET              0x40
-
-//#define RPLIDAR_SERIAL_BAUDRATE 115200;
-//#define RPLIDAR_DEFAULT_TIMEOUT 500;
 
 // Commands without payload but have response
 #define RPLIDAR_CMD_GET_DEVICE_INFO      0x50
