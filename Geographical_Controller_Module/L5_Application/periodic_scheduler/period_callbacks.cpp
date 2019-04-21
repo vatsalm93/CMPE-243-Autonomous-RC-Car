@@ -32,8 +32,10 @@
 #include "io.hpp"
 #include "periodic_callback.h"
 #include "stdio.h"
+#include "gpio.hpp"
 #include "can_code/can_tx.h"
 #include "compass/compass.h"
+#include <GPS/gps.h>
 
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
 const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
@@ -46,11 +48,15 @@ const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
  */
 const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 
+
+GPIO gpio2_0(P2_0);
+
 /// Called once before the RTOS is started, this is a good place to initialize things once
 bool period_init(void)
 {
-    LD.clear();
+    gpio2_0.setAsInput();
     can_init();
+    init_gps();
     return true;
 }
 
@@ -60,7 +66,6 @@ bool period_reg_tlm(void)
     return true; // Must return true upon success
 }
 
-
 /**
  * Below are your periodic functions.
  * The argument 'count' is the number of times each periodic task is called.
@@ -68,14 +73,16 @@ bool period_reg_tlm(void)
 void period_1Hz(uint32_t count)
 {
     check_bus_off();
+    printf("HB: %d\n",transmit_heartbeat_on_can());
 }
 
 void period_10Hz(uint32_t count)
 {
-    get_compass_data();
+   // get_compass_data();
     // Send out Driver command at 10Hz
-    //transmit_compass_data_on_can();
-    printf("%d\n",transmit_compass_data_on_can());
+    //transmit_gps_data_on_can();
+  //  printf("%d\n",transmit_compass_data_on_can());
+    check_for_data_on_gps();
 }
 
 void period_100Hz(uint32_t count)

@@ -8,9 +8,9 @@
 #include "can.h"
 #include "stdio.h"
 #include "_can_dbc/generated_can.h"
-#include "can_tx.h"
+#include "can_code/can_tx.h"
 #include "c_io.h"
-#include "compass/compass.h"
+#include "compass.h"
 
 can_msg_t msg;
 
@@ -33,10 +33,10 @@ bool can_init(void)
     return val;
 }
 
-bool transmit_dbc_data_on_can(void){
+bool transmit_gps_data_on_can(void){
     GPS_LOCATION_t gps_cmd = {0};
-    gps_cmd.CURRENT_LAT = 37.3686485291;
-    gps_cmd.CURRENT_LONG = -121.915328979;
+    gps_cmd.CURRENT_LAT_deg = 37.3686485291;
+    gps_cmd.CURRENT_LONG_deg = -121.915328979;
 
     can_msg_t can_msg = { 0 };
 
@@ -49,8 +49,6 @@ bool transmit_dbc_data_on_can(void){
                     printf("%#2X, ", can_msg.data.bytes[i]);
     }
 
-    setLCD_LEFT('0');
-    setLCD_Right('F');
     // Queue the CAN message to be sent out
     return (CAN_tx(can1, &can_msg, 0));
 }
@@ -58,26 +56,36 @@ bool transmit_dbc_data_on_can(void){
 bool transmit_compass_data_on_can(void)
 {
     COMPASS_t compass_msg = {0};
-
     can_msg_t can_msg = { 0 };
 
-    float compass_heading_value = Compass_Get_Heading_Angle();
+    float compass_Bearing_value = Compass_Get_Bearing_Angle();
 //    printf("Compass heading = %f\n", compass_heading_value);
-    compass_msg.CMP_HEADING = compass_heading_value;
+    compass_msg.CMP_BEARING_deg = compass_Bearing_value;
 
     dbc_msg_hdr_t msg_hdr = dbc_encode_COMPASS(can_msg.data.bytes, &compass_msg);
     can_msg.msg_id = msg_hdr.mid;
     can_msg.frame_fields.data_len = msg_hdr.dlc;
 
-    for (int i = 0; i < can_msg.frame_fields.data_len; i++) {
-                    printf("%#2X, ", can_msg.data.bytes[i]);
-    }
-
-//    setLCD_LEFT('0');
-//    setLCD_Right('F');
     // Queue the CAN message to be sent out
     return (CAN_tx(can1, &can_msg, 0));
 }
+
+bool transmit_heartbeat_on_can(void)
+{
+    GPS_HEARTBEAT_t heartbeat_msg = {0};
+    can_msg_t can_msg = { 0 };
+
+    heartbeat_msg.GPS_hbt = GPS_HEART_BEAT;
+
+    dbc_msg_hdr_t msg_hdr = dbc_encode_GPS_HEARTBEAT(can_msg.data.bytes, &heartbeat_msg);
+    can_msg.msg_id = msg_hdr.mid;
+    can_msg.frame_fields.data_len = msg_hdr.dlc;
+
+    setLED(4,1);
+    // Queue the CAN message to be sent out
+    return (CAN_tx(can1, &can_msg, 0));
+}
+
 
 void check_bus_off(void){
     if(CAN_is_bus_off(can1)){

@@ -18,8 +18,9 @@ extern "C" {
 #define COMPASS_BEARING_16BIT_REG_ADDR 0x02     //Address of register containing compass bearing
 #define READ_ONE_REGISTER   1                     //Read one register
 #define READ_TWO_REGISTERS  2                    //Read two registers
+#define COMPASS_OFFSET 10;
 
-float Compass_Get_Heading_Angle(void);
+float Compass_Get_Bearing_Angle(void);
 void Start_Compass_Calibration(void);
 void Stop_Compass_Calibration(void);
 void Set_Default_Calibration(void);

@@ -98,7 +98,6 @@ void UartDev::setBaudRate(unsigned int baudRate)
     /* Adding 0.5 to perform rounding correctly since we do not want
      * 1.9 to round down to 1, but we want it to round-up to 2.
      */
-
     mpUARTRegBase->LCR = (1 << 7); // Enable DLAB to access DLM, DLL, and IER
     {
         uint16_t bd = (mPeripheralClock / (16 * baudRate)) + 0.5;
@@ -106,6 +105,10 @@ void UartDev::setBaudRate(unsigned int baudRate)
         mpUARTRegBase->DLL = (bd >> 0);
     }
     mpUARTRegBase->LCR = 3; // Disable DLAB and set 8bit per char
+    //mpUARTRegBase->LCR |= 0b11<<0;  //Set data length to 8-bit
+
+   // mpUARTRegBase->LCR |= (0b1<<2);//Two stop bit
+   // mpUARTRegBase->LCR &= ~(0b1<<3);//Disable parity
 }
 
 void UartDev::handleInterrupt()

@@ -5,35 +5,30 @@
  *      Author: Vidushi
  */
 
-#include "stdio.h"
-#include "compass/compass.h"
+#include "compass.h"
 #include "c_io.h"
 #include "utilities.h"
 #include "c_i2c_base.h"
 
-#define COMPASS_OFFSET 10;
-
-float Compass_Get_Heading_Angle(void)
+float Compass_Get_Bearing_Angle(void)
 {
-    int heading_int = 0;
-    float heading_float = 0;
+    int bearing_int = 0;
+    float bearing_float = 0;
     uint8_t buffer[2] = { 0 };
 
     if (I2C_ReadRegisters(COMPASS_I2C_ADDR, COMPASS_BEARING_16BIT_REG_ADDR, &buffer[0], READ_TWO_REGISTERS))
     {
-        heading_int = buffer[0];
-        heading_int <<= 8;
-        heading_int += buffer[1];
-        heading_float = (float)(heading_int/10.00);
-       // heading_float = heading_float + COMPASS_OFFSET;
-        setLCD_Display(heading_int);
-        printf("%f\n", heading_float);
-        return heading_float;
+        bearing_int = buffer[0];
+        bearing_int <<= 8;
+        bearing_int += buffer[1];
+        bearing_float = (float)(bearing_int/10.00);
+       // bearing_float = bearing_float + COMPASS_OFFSET;
+        return bearing_float;
     }
     return 0;
 }
 
-
+//
 void Start_Compass_Calibration(void)
 {
     uint8_t buffer[1] = { 0 };
@@ -86,7 +81,7 @@ void get_compass_data(void)
             break;
         case sw4:
             setLED(4,1);
-            Compass_Get_Heading_Angle();
+            Compass_Get_Bearing_Angle();
             break;
         default:
         break;
