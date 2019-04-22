@@ -6,21 +6,22 @@
  */
 
 #include "speed_calculator.h"
-
+#include "printf_lib.h"
 uint16_t pulse = 0;
-uint8_t speed_km_hr = 0;
+float speed_km_hr = 0;
 
 void eint3_handler(void){
     pulse++;
 }
 
-uint8_t get_speed(void) {
+float get_speed(void) {
     return speed_km_hr;
 }
 
-uint8_t calculate_speed(void) {
+float calculate_speed(void) {
     uint16_t rotation_per_sec = pulse;
     pulse = 0;
-    speed_km_hr = (circumference * rotation_per_sec * 3600) / (1000);
+    speed_km_hr = (circumference * rotation_per_sec * 3600) / (1000*2.7);
+    u0_dbg_printf("Pulse: %d\n", rotation_per_sec);
     return speed_km_hr;
 }

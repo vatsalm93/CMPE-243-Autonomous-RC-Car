@@ -28,6 +28,7 @@
 #include "lpc_pwm.hpp"
 #include "printf_lib.h"
 #include "utilities.h"
+#include "soft_timer.hpp"
 
 /**
  * The main() creates tasks or "threads".  See the documentation of scheduler_task class at scheduler_task.hpp
@@ -56,6 +57,7 @@ int main(void)
      * such that it can save remote control codes to non-volatile memory.  IR remote
      * control codes can be learned by typing the "learn" terminal command.
      */
+    SoftTimer init_timer(1000);
     scheduler_add_task(new terminalTask(PRIORITY_HIGH));
 
     /* Consumes very little CPU, but need highest priority to handle mesh network ACKs */

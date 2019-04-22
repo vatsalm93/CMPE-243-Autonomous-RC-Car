@@ -7,24 +7,21 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "c_pwm.h"
-#include <stdint.h>
 #include "c_period_callbacks.h"
 #include "c_pwm.h"
 #include "printf_lib.h"
 #include "utilities.h"
-#include "c_code/motor_can_rx.h"
-#include "c_code/motor_control.h"
+#include "motor_can_rx.h"
+#include "motor_control.h"
 #include "speed_calculator.h"
 #include "eint.h"
 #include "c_io.h"
 #include "c_gpio.h"
-
-//void_func_t *ptr = eint3_handler;
+#include "lpc_timers.h"
 
 bool C_period_init(void) {
-
     setLED(1, 0);
-    eint3_enable_port2(6, eint_falling_edge, eint3_handler);
+
     motor_can_init();
     init_pwm(100);
     set_pwm_value(motor_1, 15);
@@ -32,6 +29,8 @@ bool C_period_init(void) {
     setPin();
     setInput();
 
+    lpc_timer_enable(lpc_timer3, 1000);
+    eint3_enable_port2(6, eint_falling_edge, eint3_handler);
     return true;
 }
 bool C_period_reg_tlm(void) {
@@ -39,24 +38,25 @@ bool C_period_reg_tlm(void) {
 }
 
 void C_period_1Hz(uint32_t count) {
-    motor_can_tx_heartbeat();
     (void) count;
+    calculate_speed();
+    motor_can_reset_busoff();
+    motor_can_tx_heartbeat();
 }
 
 void C_period_10Hz(uint32_t count) {
-    motor_pwm_process();
     (void) count;
+    motor_pwm_process();
 }
 
 void C_period_100Hz(uint32_t count) {
     (void) count;
- //   if(!read_pin())
- //   u0_dbg_printf("Value: %d\n", read_pin());
+
     C_period_10Hz(count);
 }
 
 void C_period_1000Hz(uint32_t count) {
     (void) count;
-    motor_can_reset_busoff();
+
 }
 

@@ -6,104 +6,126 @@
  */
 #include "motor_control.h"
 #include "printf_lib.h"
-#include "c_io.h"
+
+#define FAST_SPEED 16.80
+#define MEDIUM_SPEED 16.20
+#define SLOW_SPEED 15.92
+#define STOP 15.00
+
+#define NO_STEER 15.00
+#define SLIGHT_RIGHT 16.00
+#define SLIGHT_LEFT 14.00
+#define HARD_RIGHT 19.50
+#define HARD_LEFT 10.50
 
 const uint32_t CAR_CONTROL__MIA_MS = 3000;
-const CAR_CONTROL_t CAR_CONTROL__MIA_MSG = {MOTOR_STOP, MOTOR_DONT_STEER, {0}};
+const CAR_CONTROL_t CAR_CONTROL__MIA_MSG = {MOTOR_STOP, MOTOR_DONT_STEER, 0, {0}};
 
 
 void motor_pwm_process(void)
 {
-//    rxstat_val motor_pwm = {0};
     static CAR_CONTROL_t drive = {2, 2};
     static uint32_t count = 0;
     static bool flag = false;
     setLED(2, 0);
     setLED(3, 0);
     setLED(4, 0);
-//    motor_pwm.can_rx_stat =
-    motor_can_rx(&drive);
 
+    motor_can_rx(&drive);
+    // static pwm_val_motor = 15;
     switch (drive.MOTOR_DRIVE_cmd) {
         case MOTOR_STOP:
+            /*
+              if(pwm_val_motor < 15.8){
+                  pwm_val_motor = 15.8;
+              }
+              else if(pwm_val_motor > 16){
+                  pwm_val_motor = 16.00;
+              }
+              if(get_speed < drive.mph){
+                  set_PWM(motor_1, pwm_val_motor + 0.005);
+              }
+              if(get_speed > drive.mph){
+                  set_PWM(motor_1, pwm_val_motor - 0.005);
+              }
+             */
             flag = false;
-            u0_dbg_printf("stop\n",count);
-            set_pwm_value(motor_1, 15.00);
+            set_pwm_value(motor_1, STOP);
             setLED(4, 1);
             break;
-        case MOTOR_FWD_SLOW:
-            flag = false;
-            u0_dbg_printf("fwd slow\n",count);
-            set_pwm_value(motor_1, 15.8);
-            setLED(2, 1);
-            break;
-        case MOTOR_FWD_MED:
-            flag = false;
-            u0_dbg_printf("fwd med\n",count);
-            set_pwm_value(motor_1, 16.5);
-            break;
+//        case MOTOR_FWD_SLOW:
+//            flag = false;
+//            set_pwm_value(motor_1, SLOW_SPEED);
+//            setLED(2, 1);
+//            break;
+//        case MOTOR_FWD_MED:
+//            flag = false;
+//            set_pwm_value(motor_1, MEDIUM_SPEED);
+//            break;
         case MOTOR_REV:
-//            set_pwm_value(motor_1, 14.2);
-//            delay_ms(30);
-//            set_pwm_value(motor_1, 15);
-//            delay_ms(30);
-//            set_pwm_value(motor_1, 14.2);
             if (flag == false) {
                 u0_dbg_printf("in flag_false_rev\n");
                 if (6 == count) {
                     flag = true;
-                    u0_dbg_printf("count 4\n");
                     count = 0;
                 }
                 if (count % 3 == 0) {
-                    u0_dbg_printf("%d\n",count);
                     set_pwm_value(motor_1, 15.00);
                 }
                 else if(count % 3 == 1){
-                    u0_dbg_printf("%d\n",count);
                     set_pwm_value(motor_1, 15.00);
                 }
                 else if (count % 3 == 2) {
-                    u0_dbg_printf("%d\n",count);
                     set_pwm_value(motor_1, 14.2);
                 }
                 ++count;
             }
             else{
-                u0_dbg_printf("else\n");
                 set_pwm_value(motor_1, 14.2);
                 count = 0;
             }
             setLED(3, 1);
             break;
-        case MOTOR_FWD_FAST:
-            flag = false;
-            u0_dbg_printf("fwd fast\n",count);
-            set_pwm_value(motor_1, 18);
-            break;
+//        case MOTOR_FWD_FAST:
+//            flag = false;
+//            set_pwm_value(motor_1, FAST_SPEED);
+//            break;
         default:
-            set_pwm_value(motor_1, 15);
+            set_pwm_value(motor_1, STOP);
     }
 
     switch (drive.MOTOR_STEER_cmd) {
         case MOTOR_DONT_STEER:
-            set_pwm_value(servo_2, 15.00);
+            set_pwm_value(servo_2, NO_STEER);
             break;
         case MOTOR_STEER_FULL_LEFT:
-            set_pwm_value(servo_2, 11.50);
+            set_pwm_value(servo_2, HARD_LEFT);
             break;
         case MOTOR_STEER_SLIGHT_LEFT:
-            set_pwm_value(servo_2, 14.00);
+            set_pwm_value(servo_2, SLIGHT_LEFT);
             break;
         case MOTOR_STEER_SLIGHT_RIGHT:
-            set_pwm_value(servo_2, 16.00);
-            ;
+            set_pwm_value(servo_2, SLIGHT_RIGHT);
             break;
         case MOTOR_STEER_FULL_RIGHT:
-            set_pwm_value(servo_2, 18.50);
+            set_pwm_value(servo_2, HARD_RIGHT);
             break;
-
     }
-//    return motor_pwm;
 }
 
+void forward_speed_control(CAR_CONTROL_t *drive)
+{
+    static uint8_t pwm_val_motor = 15;
+    if (pwm_val_motor < 15.8) {
+        pwm_val_motor = 15.8;
+    }
+    else if (pwm_val_motor > 16) {
+        pwm_val_motor = 16.00;
+    }
+    if (get_speed() < drive->MOTOR_kph) {
+        set_pwm_value(motor_1, pwm_val_motor + 0.005);
+    }
+    if (get_speed() > drive->MOTOR_kph) {
+        set_pwm_value(motor_1, pwm_val_motor - 0.005);
+    }
+}

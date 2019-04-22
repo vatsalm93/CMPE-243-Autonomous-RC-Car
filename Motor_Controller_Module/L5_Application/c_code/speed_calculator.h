@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "rtc.h"
+#include "lpc_timers.h"
 #define circumference 0.33
 
 typedef struct{
@@ -19,5 +19,6 @@ typedef struct{
 } rpm_sensor_t;
 
 void eint3_handler(void);
-
+float calculate_speed(void);
+float get_speed(void);
 #endif /* SPEED_CALCULATOR_H_ */

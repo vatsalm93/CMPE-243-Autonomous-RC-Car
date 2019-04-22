@@ -9,7 +9,9 @@
 #define MOTOR_CONTROL_H_
 
 #include "motor_can_rx.h"
+#include "c_io.h"
 #include "c_pwm.h"
+#include "speed_calculator.h"
 #include "utilities.h"
 #include "generated_can.h"
 
