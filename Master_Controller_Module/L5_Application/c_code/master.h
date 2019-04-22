@@ -13,17 +13,7 @@ extern "C" {
 #endif
 
 #include "stdbool.h"
-
-#define BRIDGE_NODE 103
-#define SENSOR_NODE 104
-#define MOTOR_NODE 105
-#define GPS_LOCATION 107
-#define COMPASS         108
-
-#define MASTER_CAN_BUS      can1
-#define MASTER_BAUD_RATE    100
-#define MASTER_RX_Q         8
-#define MASTER_TX_Q         8
+#include "structures.h"
 
 typedef enum
 {
@@ -32,16 +22,35 @@ typedef enum
 } master_ack_e;
 
 void master_controller_init(void);
-bool master_avoid_obstacle(void);
+void start_obstacle_avoidance(obstacle_detection_t obs_detected);
+void start_obstacle_detection(obstacle_detection_t *obs_detection);
 void master_service_can_msgs(void);
-
-void service_sensor_msg(void);
-void service_gps_msg(void);
-void service_bridge_msg(void);
-void service_compass_msg(void);
 
 bool master_CAN_turn_on_bus_if_bus_off(void);
 void master_send_command_to_motor_module(void);
+
+void drive_motor_fwd_slow(void);
+void drive_motor_fwd_med(void);
+void drive_motor_fwd_fast(void);
+void drive_motor_rev_slow(void);
+
+void drive_motor_stop(void);
+
+void master_steer_full_left(void);
+void master_steer_full_right(void);
+void master_steer_slight_left(void);
+void master_steer_slight_right(void);
+void master_dont_steer(void);
+
+bool sys_start_stop_cmd(void);
+void master_mia_handler(void);
+void service_sensor_hbt_msg(void);
+void service_motor_hbt_msg(void);
+void service_gps_hbt_msg(void);
+void service_bridge_hbt_msg(void);
+bool hbt_sync_from_all_node(void);
+
+bool transmit_heartbeat_on_can(void);
 
 #ifdef __cplusplus
 }

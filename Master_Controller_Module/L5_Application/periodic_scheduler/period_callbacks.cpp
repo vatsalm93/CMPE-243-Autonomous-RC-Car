@@ -33,6 +33,11 @@
 #include <stdio.h>
 #include "utilities.h"
 #include "c_code/master.h"
+#include "io.hpp"
+bool start_free_run_flag = false;
+bool free_run_motor_flag = false;
+bool free_steer_flag = false;
+
 
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
 const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
@@ -68,21 +73,69 @@ void period_1Hz(uint32_t count)
 {
     (void) count;
     master_CAN_turn_on_bus_if_bus_off();
+    transmit_heartbeat_on_can();
 }
 
 void period_10Hz(uint32_t count)
 {
     (void) count;
+    if (SW.getSwitch(1))
+    {
+        start_free_run_flag = !start_free_run_flag;
+    }
+
+    if (SW.getSwitch(2))
+    {
+        free_run_motor_flag = !free_run_motor_flag;
+        if (free_run_motor_flag)
+            drive_motor_fwd_slow();
+        else
+            drive_motor_stop();
+    }
+
+    if (SW.getSwitch(3))
+    {
+        drive_motor_rev_slow();
+    }
+
+    if (SW.getSwitch(4))
+    {
+        free_steer_flag = !free_steer_flag;
+        if (free_steer_flag)
+            master_steer_full_right();
+        else
+            master_steer_full_left();
+    }
 }
 
 void period_100Hz(uint32_t count)
 {
     (void) count;
     master_service_can_msgs();
-    master_send_command_to_motor_module();
-//    sensors_100Hz();          //Do not uncomment
-//    update_sensor_struct();   //Do not uncomment
-//    send_msgs_on_can();       //Do not uncomment
+    if (start_free_run_flag == false)
+    {
+        if ((true == sys_start_stop_cmd()))
+        {
+            obstacle_detection_t check_obstacle;
+            start_obstacle_detection(&check_obstacle);
+//            start_obstacle_avoidance(check_obstacle);
+            master_send_command_to_motor_module();
+        }
+        else
+        {
+            drive_motor_stop();
+            master_dont_steer();
+            master_send_command_to_motor_module();
+        }
+    }
+    else
+    {
+        master_send_command_to_motor_module();
+    }
+
+    //    sensors_100Hz();          //Do not uncomment
+    //    update_sensor_struct();   //Do not uncomment
+    //    send_msgs_on_can();       //Do not uncomment
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():
