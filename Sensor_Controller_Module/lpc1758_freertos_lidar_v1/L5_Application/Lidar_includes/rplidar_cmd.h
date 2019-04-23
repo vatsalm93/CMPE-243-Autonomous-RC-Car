@@ -60,7 +60,7 @@
 #define Obstacle_FRONT1_end_range 359
 #define Obstacle_RIGHT_start_range 5
 #define Obstacle_RIGHT_end_range 50
-#define Obstacle_LEFT_start_range 290
+#define Obstacle_LEFT_start_range 270
 #define Obstacle_LEFT_end_range 335
 #define Obstacle_BACK_start_range 140
 #define Obstacle_BACK_end_range 200

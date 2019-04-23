@@ -10,6 +10,8 @@
 
 #include "scheduler_task.hpp"
 
+#define Period_in_Hz 50
+
 class LidarTask : public scheduler_task
 {
     public:

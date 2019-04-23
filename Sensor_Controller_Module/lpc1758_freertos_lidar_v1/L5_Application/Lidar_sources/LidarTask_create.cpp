@@ -10,6 +10,7 @@
 #include "Lidar_includes/LidarTask.h"
 #include "Lidar_includes/ultrasonic_sensor.h"
 #include "utilities.h"
+#include "printf_lib.h"
 
 static Lidar lidar_obj;
 LidarTask::LidarTask(uint8_t priority):scheduler_task("LidarTask", 2000, priority)
@@ -24,9 +25,14 @@ bool LidarTask::init()
 
 bool LidarTask::run(void *p)
 {
+    static int count = 0;
+    if(count%(100/Period_in_Hz) == 0)
+    {
     lidar_obj.Lidar_get_data();
     lidar_obj.Lidar_parse_data();
     lidar_obj.Lidar_send_data_CAN();
+    }
+    count++;
     return true;
 }
 

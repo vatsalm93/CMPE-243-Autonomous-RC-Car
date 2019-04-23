@@ -9,11 +9,11 @@
 #include <stdbool.h>
 #include "Lidar_includes/ultrasonic_sensor.h"
 #include "eint.h"
-#include "c_gpio.h"
+#include "c_code/c_gpio.h"
 #include "lpc_sys.h"
-//#include "printf_lib.h"
+#include "printf_lib.h"
 #include "utilities.h"
-#include "c_io.h"
+#include "c_code/c_io.h"
 
 sensor_lv_max_sonar_t send_ultrasonic_data;
 
@@ -26,7 +26,7 @@ static void on_pw_falling_edge()
 {
     send_ultrasonic_data.end_echo_time = sys_get_uptime_us();
     send_ultrasonic_data.distance = (double)(send_ultrasonic_data.end_echo_time - send_ultrasonic_data.start_echo_time)*(1.0/58.0);
-//    u0_dbg_printf("distance  is = %.2f\n", send_sensor_data.distance);
+   // u0_dbg_printf("distance  is = %.2f\n", send_ultrasonic_data.distance);
 }
 
 void sensor_cntlr_init()
