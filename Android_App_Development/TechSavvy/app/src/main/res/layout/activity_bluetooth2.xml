@@ -142,6 +142,15 @@
             android:checked="false"
             android:text="START" />
 
+        <Button
+            android:id="@+id/mapButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_margin="@dimen/map_margin"
+            android:onClick="mapButtonOnClick"
+            android:text="@string/map_button" />
+
     </LinearLayout>
 
 </RelativeLayout>
