@@ -148,6 +148,12 @@ public class Bluetooth extends AppCompatActivity {
         }
     }
 
+    public void mapButtonOnClick(View view){
+        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+        intent.putExtra("placeNumber", 12);
+        startActivity(intent);
+    }
+
     private static void stringParse(String str) {
         StringTokenizer st = new StringTokenizer(str);
         try{
