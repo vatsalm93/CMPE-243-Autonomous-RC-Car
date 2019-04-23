@@ -33,16 +33,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         Intent intent = getIntent();
-        int receivedValue = intent.getIntExtra("placeNumber", 0);
-        Toast.makeText(this, Integer.toString(receivedValue), Toast.LENGTH_SHORT).show();
+        //Get Longitude and Latitude Values
+        double latitude = intent.getDoubleExtra("latitude", 37.3352);
+        double longitude = intent.getDoubleExtra("longitude", -121.8811);
 
-        double latitude = 37.3352,
-               longitude = -121.8811;
+        //Round value to 2-decimal to test accuracy of GPS location
+        //https://stackoverflow.com/questions/5945867/how-to-round-the-double-value-to-2-decimal-points
+        double lat2Dec = (Math.round(latitude * 100.0))/100.0;
+        double long2Dec = (Math.round(longitude * 100.0))/100.0;
 
+        latitude = lat2Dec;
+        longitude = long2Dec;
+
+        //Convert to string for logging the values
         String latitudeStr = String.valueOf(latitude);
         String longitudeStr = String.valueOf(longitude);
 
-        String markerDisplay = "Lat: " + latitudeStr + " Long: " + longitudeStr;
+        String markerDisplay = "Lat: " + latitudeStr + "   Long: " + longitudeStr;
+        Toast.makeText(this, markerDisplay, Toast.LENGTH_LONG).show();
 
         // Add a marker in Sydney and move the camera
         LatLng SJSU = new LatLng(latitude , longitude);

@@ -149,6 +149,7 @@
             android:layout_gravity="bottom"
             android:layout_margin="@dimen/map_margin"
             android:onClick="mapButtonOnClick"
+            android:background="@android:color/holo_red_light"
             android:text="@string/map_button" />
 
     </LinearLayout>

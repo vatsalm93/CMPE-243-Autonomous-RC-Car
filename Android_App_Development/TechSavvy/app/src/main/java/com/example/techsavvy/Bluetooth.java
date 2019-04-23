@@ -150,10 +150,24 @@ public class Bluetooth extends AppCompatActivity {
 
     public void mapButtonOnClick(View view){
         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-        intent.putExtra("placeNumber", 12);
+        //intent.putExtra("placeNumber", 12);
+
+        //Copy incoming location data from bluetooth
+        double latitude =  (double)mlat_rx;
+        double longitude = (double)mlong_rx;
+
+        //Hard Coded SJSU values
+        /*double latitude =  37.3352;
+        double longitude = -121.8811;*/
+
+        //Send location to Maps
+        intent.putExtra("latitude", latitude);
+        intent.putExtra("longitude", longitude);
         startActivity(intent);
     }
 
+
+    //Parse received data from bluetooth
     private static void stringParse(String str) {
         StringTokenizer st = new StringTokenizer(str);
         try{
@@ -319,8 +333,8 @@ public class Bluetooth extends AppCompatActivity {
                     // Read from the InputStream
                     bytes = mmInStream.available();
                     if(bytes != 0) {
-                        buffer = new byte[2048];
-                        SystemClock.sleep(100); //pause and wait for rest of data. Adjust this depending on your sending speed.
+                        buffer = new byte[4096];
+                        SystemClock.sleep(1000); //pause and wait for rest of data. Adjust this depending on your sending speed.
                         bytes = mmInStream.available(); // how many bytes are ready to be read?
                         bytes = mmInStream.read(buffer, 0, bytes); // record how many bytes we actually read
                         mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
