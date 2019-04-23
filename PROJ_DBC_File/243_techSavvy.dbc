@@ -97,7 +97,20 @@ BO_ 117 MASTER_DEBUG: 1 MASTER
  SG_ IO_DEBUG_drive_mode : 2|1@1+ (1,0) [0|0] "" DBG
  SG_ IO_DEBUG_HBT_FROM_ALL_CONTR : 3|1@1+ (1,0) [0|0] "" DBG
 
+BO_ 118 GPS_DEBUG: 1 GPS
+ SG_ IO_DEBUG_CAN_init : 0|1@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_HBT_Transmit : 1|1@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_bus_off : 2|1@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_GPS_rx : 3|1@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_GPS_Fix : 4|1@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_Compass_Rx : 5|1@1+ (1,0) [0|0] "" DBG
 
+BO_ 119 BRIDGE_DEBUG: 1 BRIDGE
+ SG_ IO_DEBUG_CAN_init : 0|1@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_HBT_Transmit : 1|1@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_bus_off : 2|1@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_Connected : 3|1@1+ (1,0) [0|0] "" DBG
+ SG_ IO_DEBUG_Bridge_rx : 4|1@1+ (1,0) [0|0] "" DBG 
 
 CM_ BU_ MASTER "The master controller driving the car";
 CM_ BU_ MOTOR "The motor controller of the car";
