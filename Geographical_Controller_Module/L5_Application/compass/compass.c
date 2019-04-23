@@ -18,6 +18,7 @@ float Compass_Get_Bearing_Angle(void)
 
     if (I2C_ReadRegisters(COMPASS_I2C_ADDR, COMPASS_BEARING_16BIT_REG_ADDR, &buffer[0], READ_TWO_REGISTERS))
     {
+        setLED(3,1);
         bearing_int = buffer[0];
         bearing_int <<= 8;
         bearing_int += buffer[1];
@@ -31,15 +32,12 @@ float Compass_Get_Bearing_Angle(void)
 //
 void Start_Compass_Calibration(void)
 {
-    uint8_t buffer[1] = { 0 };
-    buffer[0] = 0xF0;
+    uint8_t buffer[3] = { 0xF0,0xF5,0xF6 };
     I2C_writeRegisters(COMPASS_I2C_ADDR, COMMAND_REG_ADDR, &buffer[0], READ_ONE_REGISTER);
     delay_ms(30);
-    buffer[0] = 0xF5;
-    I2C_writeRegisters(COMPASS_I2C_ADDR, COMMAND_REG_ADDR, &buffer[0], READ_ONE_REGISTER);
+    I2C_writeRegisters(COMPASS_I2C_ADDR, COMMAND_REG_ADDR, &buffer[1], READ_ONE_REGISTER);
     delay_ms(30);
-    buffer[0] = 0xF6;
-    I2C_writeRegisters(COMPASS_I2C_ADDR, COMMAND_REG_ADDR, &buffer[0], READ_ONE_REGISTER);
+    I2C_writeRegisters(COMPASS_I2C_ADDR, COMMAND_REG_ADDR, &buffer[2], READ_ONE_REGISTER);
 }
 
 

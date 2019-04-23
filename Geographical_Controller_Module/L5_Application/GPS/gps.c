@@ -6,15 +6,15 @@
  *      Version: V1.00
  */
 
-#include <gps.h>
-#include <stdio.h>
-#include <stdbool.h>
+#include "gps.h"
 #include "c_uart2.h"
 #include "c_io.h"
 #include "c_uart_dev.h"
 #include "utilities.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
 
 void create_gps_config(void)
 {
@@ -33,14 +33,15 @@ void init_gps(void)
 
 void gps_rx(void)
 {
-    if(cgets(gps_line, 80, 80))
+    if(cgets(gps_line, 120, 50))
     {
         setLED(3,1);
     }
-    else
+  //  printf("%s",gps_line);
+ /*   else
     {
         setLED(3,0);
-    }
+    }*/
 }
 
 bool gps_parse_data(void)
@@ -59,13 +60,12 @@ bool gps_parse_data(void)
         float tempLat = (float)(atof(lat));        // Change float values to 6 digits
         latitude = (tempLat - 100*(int)(tempLat/100))/60.0;
         latitude += (int)(tempLat/100);
-      //  printf("%f,",latitude);
 
         float tempLon = (float)atof(lon);
         longitude = (tempLon - 100*(int)(tempLon/100))/60.0;
         longitude += (int)(tempLon/100);
         longitude = -longitude;
-      //  printf("%f,",longitude);
+
         setLED(2,1);
         return true;
     }
@@ -77,6 +77,16 @@ bool gps_parse_data(void)
     }
 
     return false;
+}
+
+float getLatitude(void)
+{
+    return latitude;
+}
+
+float getLongitude(void)
+{
+    return longitude;
 }
 
 void check_for_data_on_gps(void)
