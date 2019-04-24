@@ -18,10 +18,11 @@
 #include "c_io.h"
 #include "c_gpio.h"
 #include "lpc_timers.h"
+#include "lcd.h"
+#include "can_lcd.h"
 
 bool C_period_init(void) {
     setLED(1, 0);
-
     motor_can_init();
     init_pwm(100);
     set_pwm_value(motor_1, 15);
@@ -31,6 +32,8 @@ bool C_period_init(void) {
 
     lpc_timer_enable(lpc_timer3, 1000);
     eint3_enable_port2(6, eint_falling_edge, eint3_handler);
+
+    lcd_init();
     return true;
 }
 bool C_period_reg_tlm(void) {
@@ -42,21 +45,25 @@ void C_period_1Hz(uint32_t count) {
     calculate_speed();
     motor_can_reset_busoff();
     motor_can_tx_heartbeat();
+    send_rpm();
+    lcd_screen_query();
+    lcd_receive();
+
 }
 
 void C_period_10Hz(uint32_t count) {
     (void) count;
-    motor_pwm_process();
+
+    receive_can_msg();
+    lcd_print();
 }
 
 void C_period_100Hz(uint32_t count) {
     (void) count;
-
-    C_period_10Hz(count);
+    motor_pwm_process();
 }
 
 void C_period_1000Hz(uint32_t count) {
     (void) count;
-
 }
 
