@@ -4,7 +4,9 @@
  *  Created on: Apr 17, 2019
  *      Author: Aakash
  */
-#include "includes.h"
+#include "gps.h"
+#include "c_io.h"
+#include "externs.h"
 
 void service_gps_msg(void)
 {
