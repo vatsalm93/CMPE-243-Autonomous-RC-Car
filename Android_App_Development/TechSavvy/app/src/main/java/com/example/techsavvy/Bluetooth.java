@@ -187,7 +187,7 @@ public class Bluetooth extends AppCompatActivity {
                     }
                     else if(item.equalsIgnoreCase("Bearing"))
                     {
-                        mcompass_rx = Float.parseFloat(value);
+                        //mcompass_rx = Float.parseFloat(value);
                         mcompass.setText(value);
                     }
 
