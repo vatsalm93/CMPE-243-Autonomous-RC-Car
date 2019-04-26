@@ -31,7 +31,6 @@
 #include <stdint.h>
 #include "periodic_callback.h"
 #include "c_period_callbacks.h"
-
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
 const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
 /**

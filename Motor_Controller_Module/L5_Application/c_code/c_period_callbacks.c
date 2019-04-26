@@ -4,6 +4,7 @@
  * The purpose of this "C" callbacks is to provide the code to be able
  * to call pure C functions and unit-test it in C test framework
  */
+#include <can_receive.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "c_pwm.h"
@@ -18,10 +19,10 @@
 #include "c_io.h"
 #include "c_gpio.h"
 #include "lpc_timers.h"
+#include "lcd.h"
 
 bool C_period_init(void) {
     setLED(1, 0);
-
     motor_can_init();
     init_pwm(100);
     set_pwm_value(motor_1, 15);
@@ -31,6 +32,8 @@ bool C_period_init(void) {
 
     lpc_timer_enable(lpc_timer3, 1000);
     eint3_enable_port2(6, eint_falling_edge, eint3_handler);
+
+    lcd_init();
     return true;
 }
 bool C_period_reg_tlm(void) {
@@ -42,21 +45,24 @@ void C_period_1Hz(uint32_t count) {
     calculate_speed();
     motor_can_reset_busoff();
     motor_can_tx_heartbeat();
+    send_rpm();
+//    lcd_screen_query();
+//    lcd_receive();
+
 }
 
 void C_period_10Hz(uint32_t count) {
     (void) count;
-    motor_pwm_process();
+//    lcd_print();
 }
 
 void C_period_100Hz(uint32_t count) {
     (void) count;
-
-    C_period_10Hz(count);
+    receive_can_msg();
+    motor_pwm_process();
 }
 
 void C_period_1000Hz(uint32_t count) {
     (void) count;
-
 }
 

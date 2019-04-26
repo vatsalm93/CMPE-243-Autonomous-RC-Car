@@ -19,14 +19,9 @@
 extern "C" {
 #endif
 
-//typedef struct{
-//    float motor_pwm_value;
-//    float servo_pwm_value;
-//    bool can_rx_stat;
-//}rxstat_val;
-
 void motor_pwm_process(void);
-
+void forward_speed_control(CAR_CONTROL_t *drive);
+bool ramp_stop_car(void);
 
 #ifdef __cplusplus
 }
