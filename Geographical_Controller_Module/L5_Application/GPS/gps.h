@@ -19,6 +19,8 @@ extern "C" {
 void init_gps(void);
 void check_for_data_on_gps(void);
 void gps_tx(void);
+float getLatitude(void);
+float getLongitude(void);
 
 // different commands to set the update rate from once a second (1 Hz) to 10 times a second (10Hz)
 // Note that these only control the rate at which the position is echoed, to actually speed up the
@@ -27,6 +29,7 @@ void gps_tx(void);
 #define PMTK_API_SET_FIX_CTL_5HZ  "$PMTK300,200,0,0,0,0*2F"
 // turn on only the second sentence (GPRMC)
 #define PMTK_SET_NMEA_OUTPUT_RMCONLY "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29"
+#define PMTK_SET_BAUD_57600 "$PMTK251,57600*2C"
 
 #if 0
 // Position fix update rate commands.

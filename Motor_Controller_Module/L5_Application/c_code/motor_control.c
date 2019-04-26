@@ -18,8 +18,6 @@
 #define HARD_RIGHT 19.00
 #define HARD_LEFT 11.00
 
-const uint32_t CAR_CONTROL__MIA_MS = 3000;
-const CAR_CONTROL_t CAR_CONTROL__MIA_MSG = { MOTOR_STOP, MOTOR_DONT_STEER, 0, { 0 } };
 CAR_CONTROL_t drive = {2, 2};
 
 void motor_pwm_process(void)

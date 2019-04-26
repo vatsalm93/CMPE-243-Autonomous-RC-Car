@@ -71,6 +71,8 @@ void period_1Hz(uint32_t count) //1000ms
 {
     transmit_heartbeat_on_can();
     CANresetAfterBusOff();
+    BLE_tx();
+    transmit_debug_on_can();
 }
 
 /**
@@ -80,17 +82,17 @@ void period_1Hz(uint32_t count) //1000ms
 void period_10Hz(uint32_t count) //100ms
 {
    check_for_data_on_ble();
-   CAN_Recieve();
 }
 
 void period_100Hz(uint32_t count) //10ms
 {
-  //  LE.toggle(3);
+    CAN_Recieve();
+
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():
 // scheduler_add_task(new periodicSchedulerTask(run_1Khz = true));
 void period_1000Hz(uint32_t count) //1ms
 {
-  //  LE.toggle(4);
+
 }

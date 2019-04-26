@@ -13,8 +13,8 @@ extern "C" {
 #endif
 
 #define BRIDGE_MID                  103
-#define SENSOR_MID                  104
-#define CAR_CONTROL_MID             105
+#define SENSOR_MID                  105
+#define CAR_CONTROL_MID             104
 #define MOTOR_MID                   106
 #define BRIDGE_CHECKPOINTS_MID      107
 #define GPS_LOCATION_MID            108
@@ -39,12 +39,13 @@ extern "C" {
 #define LIDAR_ZONE_2                LIDAR_PLACEMENT_OFFSET + ZONE_MID
 #define LIDAR_ZONE_3                LIDAR_PLACEMENT_OFFSET + ZONE_FAR
 
-#define OBSTACLE_TRACK_THRESHOLD    5
+#define OBSTACLE_TRACK_THRESHOLD    4
 #define CLEARANCE_TRACK_THRESHOLD   OBSTACLE_TRACK_THRESHOLD - 1
 
-#define MOTOR_SLOW_MPH              3
-#define MOTOR_MED_MPH               4
-#define MOTOR_FAST_MPH              5
+#define MOTOR_SLOW_KPH              3.00
+#define MOTOR_MED_KPH               5.00
+#define MOTOR_FAST_KPH              7.00
+#define MOTOR_STOP_KPH              0.00
 
 #ifdef __cplusplus
 }

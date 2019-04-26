@@ -30,19 +30,6 @@ float gps_longitude;
 float gps_bearing;
 float gps_distance;
 
-uint8_t master_status, sensor_status, gps_status, bridge_status;
-
-const uint32_t                             BRIDGE_NODE__MIA_MS;
-const BRIDGE_NODE_t                        BRIDGE_NODE__MIA_MSG;
-const uint32_t                             SENSOR_NODE__MIA_MS;
-const SENSOR_NODE_t                        SENSOR_NODE__MIA_MSG;
-const uint32_t                             GPS_LOCATION__MIA_MS;
-const GPS_LOCATION_t                       GPS_LOCATION__MIA_MSG;
-const uint32_t                             COMPASS__MIA_MS;
-const COMPASS_t                            COMPASS__MIA_MSG;
-const uint32_t                             MASTER_HEARTBEAT__MIA_MS;
-const MASTER_HEARTBEAT_t                   MASTER_HEARTBEAT__MIA_MSG;
-
 bool receive_can_msg(void);
 
 #ifdef __cplusplus

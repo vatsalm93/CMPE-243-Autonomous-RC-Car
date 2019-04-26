@@ -9,6 +9,21 @@
 
 #define TIMEOUT_MS 100
 
+uint8_t master_status, sensor_status, gps_status, bridge_status;
+
+const uint32_t                             BRIDGE_NODE__MIA_MS = 3000;
+const BRIDGE_NODE_t                        BRIDGE_NODE__MIA_MSG = { 0 };
+const uint32_t                             SENSOR_NODE__MIA_MS = 3000;
+const SENSOR_NODE_t                        SENSOR_NODE__MIA_MSG = {0};
+const uint32_t                             GPS_LOCATION__MIA_MS = 3000;
+const GPS_LOCATION_t                       GPS_LOCATION__MIA_MSG = {0};
+const uint32_t                             COMPASS__MIA_MS = 3000;
+const COMPASS_t                            COMPASS__MIA_MSG = {0};
+const uint32_t                             MASTER_HEARTBEAT__MIA_MS = 3000;
+const MASTER_HEARTBEAT_t                   MASTER_HEARTBEAT__MIA_MSG = {0};
+const uint32_t                             CAR_CONTROL__MIA_MS = 3000;
+const CAR_CONTROL_t                        CAR_CONTROL__MIA_MSG = { MOTOR_STOP, MOTOR_DONT_STEER, 0, { 0 } };
+
 bool receive_can_msg(void){
     can_msg_t can_motor_msg;
     dbc_msg_hdr_t can_msg_hdr;
@@ -56,7 +71,7 @@ bool receive_can_msg(void){
 
     if(dbc_handle_mia_SENSOR_NODE(&sensor_msg, 100))
         sensor_status = 0;
-    if (dbc_handle_mia_CAR_CONTROL(&drive, 10)) {
+    if (dbc_handle_mia_CAR_CONTROL(&drive, 1)) {
         drive.MOTOR_DRIVE_cmd = 2;
         drive.MOTOR_STEER_cmd = 2;
         setLED(1, 1);

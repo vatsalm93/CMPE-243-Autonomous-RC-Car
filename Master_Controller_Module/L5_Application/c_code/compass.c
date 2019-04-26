@@ -4,7 +4,9 @@
  *  Created on: Apr 17, 2019
  *      Author: Aakash
  */
-#include "includes.h"
+#include "compass.h"
+#include "c_io.h"
+#include "externs.h"
 
 void service_compass_msg(void)
 {

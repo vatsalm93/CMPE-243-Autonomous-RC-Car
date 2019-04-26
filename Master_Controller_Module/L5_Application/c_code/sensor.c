@@ -4,7 +4,9 @@
  *  Created on: Apr 17, 2019
  *      Author: Aakash
  */
-#include "includes.h"
+#include "sensor.h"
+#include "c_io.h"
+#include "externs.h"
 
 void service_sensor_msg(void)
 {

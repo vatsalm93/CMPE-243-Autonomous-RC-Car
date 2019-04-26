@@ -49,12 +49,12 @@ const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
 const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 
 
-GPIO gpio2_0(P2_0);
+GPIO gpio1_0(P1_29);
 
 /// Called once before the RTOS is started, this is a good place to initialize things once
 bool period_init(void)
 {
-    gpio2_0.setAsInput();
+    gpio1_0.setAsInput();
     can_init();
     init_gps();
     return true;
@@ -73,20 +73,21 @@ bool period_reg_tlm(void)
 void period_1Hz(uint32_t count)
 {
     check_bus_off();
-    printf("HB: %d\n",transmit_heartbeat_on_can());
+    transmit_heartbeat_on_can();
+    transmit_debug_data_on_can();
 }
 
 void period_10Hz(uint32_t count)
 {
+    check_for_data_on_gps();
    // get_compass_data();
     // Send out Driver command at 10Hz
-    //transmit_gps_data_on_can();
-  //  printf("%d\n",transmit_compass_data_on_can());
-    check_for_data_on_gps();
+    transmit_compass_data_on_can();
 }
 
 void period_100Hz(uint32_t count)
 {
+    transmit_gps_data_on_can();
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():

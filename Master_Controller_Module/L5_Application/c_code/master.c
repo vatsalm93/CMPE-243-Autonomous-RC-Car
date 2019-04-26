@@ -29,20 +29,20 @@ can_msg_t can_msg;
 dbc_msg_hdr_t can_msg_hdr;
 
 const uint32_t                             BRIDGE_NODE__MIA_MS = 3000;
-const BRIDGE_NODE_t                        BRIDGE_NODE__MIA_MSG = { 1, {0} };
+const BRIDGE_NODE_t                        BRIDGE_NODE__MIA_MSG = { 0, {0} };
 const uint32_t                             SENSOR_NODE__MIA_MS = 3000;
 const SENSOR_NODE_t                        SENSOR_NODE__MIA_MSG = { 0 };
 const uint32_t                             GPS_LOCATION__MIA_MS = 3000;
 const GPS_LOCATION_t                       GPS_LOCATION__MIA_MSG = { 37.3686485, -121.9153289, {0} };
 const uint32_t                             COMPASS__MIA_MS = 3000;
 const COMPASS_t                            COMPASS__MIA_MSG = { 37.3686485, -121.9153289, {0} };
-const uint32_t                             SENSOR_HEARTBEAT__MIA_MS = 2000;
+const uint32_t                             SENSOR_HEARTBEAT__MIA_MS = 5000;
 const SENSOR_HEARTBEAT_t                   SENSOR_HEARTBEAT__MIA_MSG = {0, {0}};
-const uint32_t                             MOTOR_HEARTBEAT__MIA_MS = 2000;
+const uint32_t                             MOTOR_HEARTBEAT__MIA_MS = 5000;
 const MOTOR_HEARTBEAT_t                    MOTOR_HEARTBEAT__MIA_MSG = {0, {0}};
-const uint32_t                             GPS_HEARTBEAT__MIA_MS = 2000;
+const uint32_t                             GPS_HEARTBEAT__MIA_MS = 5000;
 const GPS_HEARTBEAT_t                      GPS_HEARTBEAT__MIA_MSG = {0, {0}};
-const uint32_t                             BRIDGE_HEARTBEAT__MIA_MS = 2000;
+const uint32_t                             BRIDGE_HEARTBEAT__MIA_MS = 5000;
 const BRIDGE_HEARTBEAT_t                   BRIDGE_HEARTBEAT__MIA_MSG = {0, {0}};
 
 bool start_cmd = false;
@@ -51,12 +51,18 @@ bool motor_hbt_sync = false;
 bool gps_hbt_sync = false;
 bool bridge_hbt_sync = false;
 
+bool can_init_flag = false;
+bool bus_off_flag = false;
+
+bool start_free_run_flag = false;
+bool free_run_motor_flag = false;
+bool free_steer_flag = false;
+
 void master_controller_init(void)
 {
-    bool status = false;
     do {
-        status = CAN_init(CAN_BUS, CAN_BAUD_RATE, 10, 10, 0, 0);
-    } while(false == status);
+        can_init_flag = CAN_init(CAN_BUS, CAN_BAUD_RATE, 10, 10, 0, 0);
+    } while(false == can_init_flag);
 
     CAN_bypass_filter_accept_all_msgs();
     CAN_reset_bus(CAN_BUS);
@@ -65,7 +71,7 @@ void master_controller_init(void)
 void start_obstacle_detection(obstacle_detection_t *obs_detection)
 {
     uint16_t front_sensor = sensor_data.SENSOR_FRONT_cm;
-//    uint8_t obs_front = sensor_data.LIDAR_Obstacle_FRONT;
+    uint8_t obs_front = sensor_data.LIDAR_Obstacle_FRONT;
     uint8_t obs_left = sensor_data.LIDAR_Obstacle_LEFT;
     uint8_t obs_right = sensor_data.LIDAR_Obstacle_RIGHT;
     uint8_t obs_back = sensor_data.LIDAR_Obstacle_BACK;
@@ -77,63 +83,6 @@ void start_obstacle_detection(obstacle_detection_t *obs_detection)
     obs_detection->rearleft = false;
     obs_detection->rearright = false;
 
-    if ((obs_left < OBSTACLE_TRACK_THRESHOLD) && (obs_right > OBSTACLE_TRACK_THRESHOLD) && (front_sensor > 100))
-    {
-        drive_motor_fwd_slow();
-        master_steer_slight_right();
-    }
-    else if ((obs_left > OBSTACLE_TRACK_THRESHOLD) && (obs_right < OBSTACLE_TRACK_THRESHOLD) && (front_sensor > 100))
-    {
-        drive_motor_fwd_slow();
-        master_steer_slight_left();
-    }
-    else if ((obs_left < OBSTACLE_TRACK_THRESHOLD) && (obs_right > OBSTACLE_TRACK_THRESHOLD) && (front_sensor < 100))
-    {
-        drive_motor_fwd_slow();
-        master_steer_full_right();
-    }
-    else if ((obs_left > OBSTACLE_TRACK_THRESHOLD) && (obs_right < OBSTACLE_TRACK_THRESHOLD) && (front_sensor < 100))
-    {
-        drive_motor_fwd_slow();
-        master_steer_full_left();
-    }
-    else if ((obs_left < OBSTACLE_TRACK_THRESHOLD) && (obs_right < OBSTACLE_TRACK_THRESHOLD) && (front_sensor > 100))
-    {
-        drive_motor_fwd_slow();
-        master_dont_steer();
-    }
-    else if ((obs_left < OBSTACLE_TRACK_THRESHOLD) && (obs_right < OBSTACLE_TRACK_THRESHOLD) && (front_sensor < 100))
-    {
-        if (obs_left < obs_right)
-        {
-            drive_motor_fwd_slow();
-            master_steer_full_right();
-        }
-        else if (obs_left > obs_right)
-        {
-            drive_motor_fwd_slow();
-            master_steer_full_left();
-        }
-        else
-        {
-            if (obs_back < OBSTACLE_TRACK_THRESHOLD - 1)
-            {
-                drive_motor_stop();
-                master_dont_steer();
-            }
-            else
-            {
-                drive_motor_rev_slow();
-                master_dont_steer();
-            }
-        }
-    }
-    else
-    {
-        drive_motor_fwd_med();
-        master_dont_steer();
-    }
-#if 0
     //front obstacle
     if (((obs_front > 0) && (obs_front < OBSTACLE_TRACK_THRESHOLD)) || (front_sensor < 100))
     {
@@ -142,14 +91,14 @@ void start_obstacle_detection(obstacle_detection_t *obs_detection)
     }
 
     //front-left obstacle
-    if ((obs_left > 0) && (obs_left < OBSTACLE_TRACK_THRESHOLD))
+    if ((obs_left > 0) && (obs_left < OBSTACLE_TRACK_THRESHOLD + 1))
     {
         obs_detection->no_obstacle = false;
         obs_detection->frontleft = true;
     }
 
     //front-right obstacle
-    if ((obs_right > 0) && (obs_right < OBSTACLE_TRACK_THRESHOLD))
+    if ((obs_right > 0) && (obs_right < OBSTACLE_TRACK_THRESHOLD + 1))
     {
         obs_detection->no_obstacle = false;
         obs_detection->frontright = true;
@@ -162,8 +111,8 @@ void start_obstacle_detection(obstacle_detection_t *obs_detection)
         obs_detection->rear = true;
     }
 
-    //front clearance check
-    //for front right
+//    //front clearance check
+//    //for front right
     if((obs_detection->front && obs_front < CLEARANCE_TRACK_THRESHOLD) && !obs_detection->frontright)
     {
         obs_detection->frontright = true;
@@ -175,15 +124,15 @@ void start_obstacle_detection(obstacle_detection_t *obs_detection)
         obs_detection->frontleft = true;
         obs_detection->no_obstacle = false;
     }
-#endif
 }
 
 void start_obstacle_avoidance(obstacle_detection_t obs_detected)
 {
     if (obs_detected.no_obstacle == true)
     {
-        car_control.MOTOR_DRIVE_cmd = MOTOR_FWD_MED;
+        car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
         car_control.MOTOR_STEER_cmd = MOTOR_DONT_STEER;
+        car_control.MOTOR_kph = MOTOR_SLOW_KPH;
     }
     else
     {
@@ -194,96 +143,109 @@ void start_obstacle_avoidance(obstacle_detection_t obs_detected)
             {
                 car_control.MOTOR_DRIVE_cmd = MOTOR_STOP;
                 car_control.MOTOR_STEER_cmd = MOTOR_DONT_STEER;
+                car_control.MOTOR_kph = MOTOR_STOP_KPH;
             }
             else
             {
                 car_control.MOTOR_DRIVE_cmd = MOTOR_REV;
                 car_control.MOTOR_STEER_cmd = MOTOR_DONT_STEER;
+                car_control.MOTOR_kph = MOTOR_SLOW_KPH;
             }
         }
         else if ((obs_detected.front == true) && (obs_detected.frontleft == true))
         {
-            car_control.MOTOR_DRIVE_cmd = MOTOR_FWD_SLOW;
+            car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
             car_control.MOTOR_STEER_cmd = MOTOR_STEER_FULL_RIGHT;
+            car_control.MOTOR_kph = MOTOR_SLOW_KPH;
         }
         else if ((obs_detected.front == true) && (obs_detected.frontright == true))
         {
-            car_control.MOTOR_DRIVE_cmd = MOTOR_FWD_SLOW;
+            car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
             car_control.MOTOR_STEER_cmd = MOTOR_STEER_FULL_LEFT;
+            car_control.MOTOR_kph = MOTOR_SLOW_KPH;
         }
         else
         {
             if (obs_detected.frontleft == true)
             {
-                car_control.MOTOR_DRIVE_cmd = MOTOR_FWD_SLOW;
+                car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
                 car_control.MOTOR_STEER_cmd = MOTOR_STEER_SLIGHT_RIGHT;
+                car_control.MOTOR_kph = MOTOR_SLOW_KPH;
             }
             else if (obs_detected.frontright == true)
             {
-                car_control.MOTOR_DRIVE_cmd = MOTOR_FWD_SLOW;
+                car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
                 car_control.MOTOR_STEER_cmd = MOTOR_STEER_SLIGHT_LEFT;
+                car_control.MOTOR_kph = MOTOR_SLOW_KPH;
             }
             else if (obs_detected.front == true)
             {
-                car_control.MOTOR_DRIVE_cmd = MOTOR_FWD_SLOW;
+                car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
                 car_control.MOTOR_STEER_cmd = MOTOR_STEER_FULL_RIGHT;
+                car_control.MOTOR_kph = MOTOR_SLOW_KPH;
             }
             else
             {
-                car_control.MOTOR_DRIVE_cmd = MOTOR_FWD_SLOW;
+                car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
                 car_control.MOTOR_STEER_cmd = MOTOR_DONT_STEER;
+                car_control.MOTOR_kph = MOTOR_SLOW_KPH;
             }
         }
     }
 }
 
 
-void drive_motor_fwd_slow(void)
+ inline void drive_motor_fwd_slow(void)
 {
-    car_control.MOTOR_DRIVE_cmd = MOTOR_FWD_SLOW;
+    car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
+    car_control.MOTOR_kph = MOTOR_SLOW_KPH;
 }
 
-void drive_motor_fwd_med(void)
+ inline void drive_motor_fwd_med(void)
 {
-    car_control.MOTOR_DRIVE_cmd = MOTOR_FWD_MED;
+    car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
+    car_control.MOTOR_kph = MOTOR_MED_KPH;
 }
 
-void drive_motor_fwd_fast(void)
+ inline void drive_motor_fwd_fast(void)
 {
-    car_control.MOTOR_DRIVE_cmd = MOTOR_FWD_FAST;
+    car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
+    car_control.MOTOR_kph = MOTOR_FAST_KPH;
 }
 
-void drive_motor_rev_slow(void)
+ inline void drive_motor_rev_slow(void)
 {
     car_control.MOTOR_DRIVE_cmd = MOTOR_REV;
+    car_control.MOTOR_kph = MOTOR_SLOW_KPH;
 }
 
-void drive_motor_stop(void)
+ inline void drive_motor_stop(void)
 {
     car_control.MOTOR_DRIVE_cmd = MOTOR_STOP;
+    car_control.MOTOR_kph = MOTOR_STOP_KPH;
 }
 
-void master_steer_full_left(void)
+ inline void master_steer_full_left(void)
 {
     car_control.MOTOR_STEER_cmd = MOTOR_STEER_FULL_LEFT;
 }
 
-void master_steer_full_right(void)
+ inline void master_steer_full_right(void)
 {
     car_control.MOTOR_STEER_cmd = MOTOR_STEER_FULL_RIGHT;
 }
 
-void master_steer_slight_left(void)
+ inline void master_steer_slight_left(void)
 {
     car_control.MOTOR_STEER_cmd = MOTOR_STEER_SLIGHT_LEFT;
 }
 
-void master_steer_slight_right(void)
+ inline void master_steer_slight_right(void)
 {
     car_control.MOTOR_STEER_cmd = MOTOR_STEER_SLIGHT_RIGHT;
 }
 
-void master_dont_steer(void)
+ inline void master_dont_steer(void)
 {
     car_control.MOTOR_STEER_cmd = MOTOR_DONT_STEER;
 }
@@ -344,19 +306,19 @@ void master_mia_handler(void)
     {
         setLED(4, true);
     }
-    if (dbc_handle_mia_SENSOR_HEARTBEAT(&sensor_hbt, 1000))
+    if (dbc_handle_mia_SENSOR_HEARTBEAT(&sensor_hbt, 50))
     {
         sensor_hbt_sync = false;
     }
-    if (dbc_handle_mia_MOTOR_HEARTBEAT(&motor_hbt, 1000))
+    if (dbc_handle_mia_MOTOR_HEARTBEAT(&motor_hbt, 50))
     {
         motor_hbt_sync = false;
     }
-    if (dbc_handle_mia_GPS_HEARTBEAT(&gps_hbt, 1000))
+    if (dbc_handle_mia_GPS_HEARTBEAT(&gps_hbt, 50))
     {
         gps_hbt_sync = false;
     }
-    if (dbc_handle_mia_BRIDGE_HEARTBEAT(&bridge_hbt, 1000))
+    if (dbc_handle_mia_BRIDGE_HEARTBEAT(&bridge_hbt, 50))
     {
         bridge_hbt_sync = false;
     }
@@ -386,10 +348,12 @@ bool master_CAN_turn_on_bus_if_bus_off(void)
 {
     if (CAN_is_bus_off(CAN_BUS))
     {
+        bus_off_flag = true;
         CAN_bypass_filter_accept_all_msgs();
         CAN_reset_bus(CAN_BUS);
         return true;
     }
+    bus_off_flag = false;
     return false;
 }
 
@@ -409,4 +373,17 @@ bool transmit_heartbeat_on_can(void)
     return (CAN_tx(CAN_BUS, &can_msg, 0));
 }
 
+void master_send_debug_msg(void)
+{
+    MASTER_DEBUG_t master_dbg_msg = {0};
+    master_dbg_msg.IO_DEBUG_CAN_init = can_init_flag;
+    master_dbg_msg.IO_DEBUG_HBT_FROM_ALL_CONTR = hbt_sync_from_all_node();
+    master_dbg_msg.IO_DEBUG_drive_mode = start_free_run_flag;
+    master_dbg_msg.IO_DEBUG_bus_off = bus_off_flag;
 
+    dbc_msg_hdr_t msg_hdr = dbc_encode_MASTER_DEBUG(can_msg.data.bytes, &master_dbg_msg);
+    can_msg.msg_id = msg_hdr.mid;
+    can_msg.frame_fields.data_len = msg_hdr.dlc;
+    // Queue the CAN message to be sent out
+    CAN_tx(CAN_BUS, &can_msg, 0);
+}

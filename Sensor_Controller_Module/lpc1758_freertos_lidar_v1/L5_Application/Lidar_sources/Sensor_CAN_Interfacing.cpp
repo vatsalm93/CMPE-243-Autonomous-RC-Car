@@ -22,6 +22,7 @@
 
 extern SENSOR_NODE_t sensor_cmd;
 extern sensor_lv_max_sonar_t send_ultrasonic_data;
+static SENSOR_DEBUG_t debug_msg;
 
 bool sensor_can_init()
 {
@@ -32,7 +33,7 @@ bool sensor_can_init()
 
     CAN_reset_bus(SENSOR_CAN_BUS);
 
-    u0_dbg_printf("can init return %d \n",status);
+    debug_msg.IO_DEBUG_CAN_init = status;
     return status;
 }
 
@@ -42,9 +43,12 @@ bool sensor_send_data(void)
     can_msg_t can_msg = {0};
     u0_dbg_printf("sensor data %x\n",sensor_cmd);
     dbc_msg_hdr_t can_msg_hdr = dbc_encode_SENSOR_NODE(can_msg.data.bytes, &sensor_cmd);
+   // dbc_msg_hdr_t dbc_msg_hdr_t = SENSOR_DEBUG_HDR(can_msg.data.bytes, &debug_msg);
     can_msg.msg_id = can_msg_hdr.mid;
     can_msg.frame_fields.data_len = can_msg_hdr.dlc;
-    return (CAN_tx(SENSOR_CAN_BUS, &can_msg, 0));
+    bool flag = CAN_tx(SENSOR_CAN_BUS, &can_msg, 0);
+    debug_msg.IO_DEBUG_CAN_TX = flag;
+    return flag;
 }
 
 bool transmit_heartbeat_on_can(void)

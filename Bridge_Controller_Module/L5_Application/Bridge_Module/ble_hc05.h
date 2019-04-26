@@ -20,6 +20,7 @@ extern "C" {
 
 void BLE_init();
 void check_for_data_on_ble();
+void BLE_tx();
 
 enum dataFromApp {
     STOP_CMD = 0,
@@ -32,8 +33,9 @@ enum dataFromApp {
  */
 typedef struct {
     char getdata;
-    const char* latitude;
-    const char* longitude;
+    char latitude[15];
+    char longitude[15];
+    char bearing[20];
 } __attribute__((__packed__)) ble_msg_t;
 
 

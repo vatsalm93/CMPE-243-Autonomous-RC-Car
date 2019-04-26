@@ -23,6 +23,7 @@ void motor_pwm_process(void);
 void forward_speed_control(CAR_CONTROL_t *drive);
 bool ramp_stop_car(void);
 
+
 #ifdef __cplusplus
 }
 #endif
