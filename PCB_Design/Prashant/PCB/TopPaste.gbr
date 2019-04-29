@@ -3,7 +3,7 @@ G04 TopPaste.gbr*
 %MOIN*%
 G04 #@! TF.FileFunction,Paste,Top*
 G04 #@! TF.Part,Single*
-%ADD69R,0.094488X0.086614*%
+%ADD70R,0.094488X0.086614*%
 %FSLAX26Y26*%
 G04*
 G70*
@@ -12,7 +12,7 @@ G75*
 G01*
 G04 TopPaste*
 %LPD*%
-D69*
+D70*
 X532283Y1525984D3*
 Y900000D3*
 M02*
