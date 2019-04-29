@@ -10,6 +10,7 @@
 #include "Lidar_includes/Sensor_CAN_Interfacing.h"
 #include "c_code/c_io.h"
 #include "c_code/c_pwm.h"
+#include "Lidar_includes/RPLidar.h"
 
 static PWM pwm2(PWM::pwm6, 100);
 static RPLidar lidar;
@@ -32,8 +33,6 @@ bool Lidar::Lidar_init()
     pwm2.set(0);
     pwm2.set(100);
     uint32_t result = lidar.startScan(0,lidar.RPLIDAR_DEFAULT_TIMEOUT);
-//    u0_dbg_printf("LIDAR start scan success\n");
-//    u0_dbg_printf("scan returned result %x\n,result");
     if(!IS_OK(result))
     {
         u0_dbg_printf("scanned timed out\n");
@@ -59,19 +58,20 @@ void Lidar::Lidar_get_data()
     }
 }
 
+//Changes
 void Lidar::Lidar_parse_data()
 {
-    int length_of_buffer = sizeof(refined_response_buff)/sizeof(refined_response_buff[0]);
+    int length = (sizeof(refined_response_buff))/(sizeof(refined_response_buff[0]));
     int *p = (int *)&singleRotation;
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 12; i++)
     {
         *p = 13;
         p++;
     }
-    lidar.divideAngle(refined_response_buff,length_of_buffer, &singleRotation);
+    lidar.divideAngle(refined_response_buff,length, &singleRotation);
 }
 
 void Lidar::Lidar_send_data_CAN()
 {
-    sensor_send_data();
+    sensor_send_data(&singleRotation);
 }

@@ -14,10 +14,23 @@ typedef struct
 
 typedef struct
 {
-    int sector_front;
+/*    int sector_front;
     int sector_front_left;
     int sector_front_right;
-    int sector_rear;
+    int sector_rear;*/
+
+    int s0;
+    int s1;
+    int s2;
+    int s3;
+    int s4;
+    int s5;
+    int s6;
+    int s7;
+    int s8;
+    int s9;
+    int s10;
+    int s11;
 }RPLidarRotation;
 
 class RPLidar
