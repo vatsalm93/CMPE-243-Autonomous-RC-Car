@@ -13,6 +13,8 @@ extern "C" {
 #endif
 
 void service_gps_msg(void);
+void service_gps_hbt_msg(void);
+
 
 #ifdef __cplusplus
 }
