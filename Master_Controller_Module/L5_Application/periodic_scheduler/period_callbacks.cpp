@@ -34,8 +34,8 @@
 #include "utilities.h"
 #include "c_code/master.h"
 #include "io.hpp"
-#include "externs.h"
-
+#include "c_code/externs.h"
+#include "c_code/motor.h"
 
 
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
@@ -82,32 +82,32 @@ void period_10Hz(uint32_t count)
 {
     (void) count;
     if (SW.getSwitch(1))
-        {
-            start_free_run_flag = !start_free_run_flag;
-        }
+    {
+        start_free_run_flag = !start_free_run_flag;
+    }
 
-        if (SW.getSwitch(2))
-        {
-            free_run_motor_flag = !free_run_motor_flag;
-            if (free_run_motor_flag)
-                drive_motor_fwd_slow();
-            else
-                drive_motor_stop();
-        }
+    if (SW.getSwitch(2))
+    {
+        free_run_motor_flag = !free_run_motor_flag;
+        if (free_run_motor_flag)
+            drive_motor_fwd_slow();
+        else
+            drive_motor_stop();
+    }
 
-        if (SW.getSwitch(3))
-        {
-            drive_motor_rev_slow();
-        }
+    if (SW.getSwitch(3))
+    {
+        drive_motor_rev_slow();
+    }
 
-        if (SW.getSwitch(4))
-        {
-            free_steer_flag = !free_steer_flag;
-            if (free_steer_flag)
-                master_steer_full_right();
-            else
-                master_steer_full_left();
-        }
+    if (SW.getSwitch(4))
+    {
+        free_steer_flag = !free_steer_flag;
+        if (free_steer_flag)
+            master_steer_full_right();
+        else
+            master_steer_full_left();
+    }
 
 }
 
@@ -119,22 +119,16 @@ void period_100Hz(uint32_t count)
     {
         if ((true == sys_start_stop_cmd()))
         {
-            obstacle_detection_t check_obstacle;
-            start_obstacle_detection(&check_obstacle);
-            start_obstacle_avoidance(check_obstacle);
-            master_send_command_to_motor_module();
+            start_obstacle_avoidance();
         }
         else
         {
             drive_motor_stop();
             master_dont_steer();
-            master_send_command_to_motor_module();
         }
+
     }
-    else
-    {
-        master_send_command_to_motor_module();
-    }
+    master_send_command_to_motor_module();
 
 
     //    sensors_100Hz();          //Do not uncomment

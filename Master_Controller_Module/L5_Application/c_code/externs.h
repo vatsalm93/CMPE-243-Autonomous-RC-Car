@@ -10,6 +10,11 @@
 #include "stdbool.h"
 #include "../../_can_dbc/generated_can.h"
 #include "can.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern bool start_cmd;
 extern bool sensor_hbt_sync;
 extern bool motor_hbt_sync;
@@ -28,5 +33,9 @@ extern BRIDGE_HEARTBEAT_t bridge_hbt;
 
 extern can_msg_t can_msg;
 extern dbc_msg_hdr_t can_msg_hdr;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* EXTERNS_H_ */

@@ -27,6 +27,8 @@ extern "C" {
 
 #define CAN_BUS                     can1
 #define CAN_BAUD_RATE               100
+#define CAN_RX_QUEUE_SIZE           15
+#define CAN_TX_QUEUE_SIZE           10
 
 #define HEART_BEAT_cmd              1
 
@@ -41,6 +43,8 @@ extern "C" {
 
 #define OBSTACLE_TRACK_THRESHOLD    4
 #define CLEARANCE_TRACK_THRESHOLD   OBSTACLE_TRACK_THRESHOLD - 1
+
+#define ULTRASONIC_THRESHOLD        100
 
 #define MOTOR_SLOW_KPH              3.00
 #define MOTOR_MED_KPH               5.00
