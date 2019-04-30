@@ -17,7 +17,7 @@ extern "C" {
 
 void setLED(uint8_t ledNum, bool on);
 void setLCD_Display(char num);
-void Clear_Display();
+void Clear_Display(void);
 void setLCD_LEFT(char num);
 void setLCD_Right(char num);
 uint8_t switch_detect(void);
