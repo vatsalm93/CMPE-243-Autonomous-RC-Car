@@ -9,8 +9,8 @@
 
 const can_t can = can1;
 const uint32_t baudRate = 100;
-const uint16_t rxQueueSize = 100;
-const uint16_t txQueueSize = 100;
+const uint16_t rxQueueSize = 10;
+const uint16_t txQueueSize = 10;
 const uint32_t timeout_ms = 0;
 
 bool motor_can_init(void) {

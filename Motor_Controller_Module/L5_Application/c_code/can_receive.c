@@ -7,7 +7,7 @@
 #include "can_receive.h"
 #include "printf_lib.h"
 
-#define TIMEOUT_MS 100
+#define TIMEOUT_MS 0
 
 uint8_t master_status, sensor_status, gps_status, bridge_status;
 
@@ -32,7 +32,7 @@ bool receive_can_msg(void){
     GPS_LOCATION_t gps_msg = {0};
     COMPASS_t compass_msg = {0};
     bool motor_rx_flag = false;
-    if (CAN_rx(can1, &can_motor_msg, TIMEOUT_MS))
+    while (CAN_rx(can1, &can_motor_msg, TIMEOUT_MS))
     {
         can_msg_hdr.dlc = can_motor_msg.frame_fields.data_len;
         can_msg_hdr.mid = can_motor_msg.msg_id;
@@ -71,7 +71,7 @@ bool receive_can_msg(void){
 
     if(dbc_handle_mia_SENSOR_NODE(&sensor_msg, 100))
         sensor_status = 0;
-    if (dbc_handle_mia_CAR_CONTROL(&drive, 1)) {
+    if (dbc_handle_mia_CAR_CONTROL(&drive, 100)) {
         drive.MOTOR_DRIVE_cmd = 2;
         drive.MOTOR_STEER_cmd = 2;
         setLED(1, 1);

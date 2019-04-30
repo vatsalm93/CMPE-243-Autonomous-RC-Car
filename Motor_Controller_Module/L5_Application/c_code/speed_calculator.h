@@ -10,8 +10,12 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "lpc_timers.h"
+//#include "lpc_timers.h"
 #define circumference 0.33
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct{
     uint16_t rpm_pulses_sec;
@@ -21,4 +25,9 @@ typedef struct{
 void eint3_handler(void);
 float calculate_speed(void);
 float get_speed(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* SPEED_CALCULATOR_H_ */

@@ -12,16 +12,16 @@
 #include "c_io.h"
 #include "c_pwm.h"
 #include "speed_calculator.h"
-#include "utilities.h"
 #include "generated_can.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void motor_pwm_process(void);
-void forward_speed_control(CAR_CONTROL_t *drive);
-bool ramp_stop_car(void);
+void command_motor(CAR_CONTROL_t *drive_motor);
+void command_servo(CAR_CONTROL_t *drive_motor);
+void forward_speed_control(CAR_CONTROL_t *drive_forward);
+void command_motor_reverse(void);
 
 
 #ifdef __cplusplus

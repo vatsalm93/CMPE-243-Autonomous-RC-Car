@@ -9,17 +9,15 @@
 #include <stdbool.h>
 #include "c_pwm.h"
 #include "c_period_callbacks.h"
-#include "c_pwm.h"
-#include "printf_lib.h"
-#include "utilities.h"
 #include "motor_can_rx.h"
 #include "motor_control.h"
 #include "speed_calculator.h"
 #include "eint.h"
 #include "c_io.h"
 #include "c_gpio.h"
-#include "lpc_timers.h"
 #include "lcd.h"
+#include "lpc_timers.h"
+#include "printf_lib.h"
 
 bool C_period_init(void) {
     setLED(1, 0);
@@ -46,23 +44,24 @@ void C_period_1Hz(uint32_t count) {
     motor_can_reset_busoff();
     motor_can_tx_heartbeat();
     send_rpm();
-//    lcd_screen_query();
-//    lcd_receive();
+    lcd_screen_query();
 
 }
 
 void C_period_10Hz(uint32_t count) {
     (void) count;
-//    lcd_print();
 }
 
 void C_period_100Hz(uint32_t count) {
     (void) count;
     receive_can_msg();
-    motor_pwm_process();
+    command_servo(&drive);
+    command_motor(&drive);
+//    lcd_print();
 }
 
 void C_period_1000Hz(uint32_t count) {
     (void) count;
+   // lcd_receive();
 }
 

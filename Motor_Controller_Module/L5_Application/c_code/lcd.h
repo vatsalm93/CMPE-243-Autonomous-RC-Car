@@ -8,6 +8,10 @@
 #ifndef LCD_H_
 #define LCD_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LCD_BAUD_RATE   115200
 #define LCD_RX_Q_SIZE   100
 #define LCD_TX_Q_SIZE   100
@@ -66,5 +70,9 @@ void lcd_print_sensor_screen();
 void lcd_print_home_screen();
 void lcd_print_mia_screen();
 void lcd_put_string(char obj_num, char *data, int data_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LCD_H_ */
