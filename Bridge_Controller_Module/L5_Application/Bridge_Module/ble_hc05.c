@@ -6,17 +6,17 @@
  *      Version: V1.00
  */
 
-#include <Bridge_Module/ble_hc05.h>
+#include "ble_hc05.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "c_uart2.h"
 #include "c_uart_dev.h"
 #include "c_io.h"
-#include <can_code/CAN_Communication.h>
+#include "../can_code/CAN_Communication.h"
 
 ble_msg_t ble_param = {0};
 
-void BLE_init()
+void BLE_init(void)
 {
     //Clear_Display();      /* Clear the display */
     cUart2_init(UART2_BAUD_RATE, UART2_RXQ_SIZE, UART2_TXQ_SIZE);      /* Init baud rate */
@@ -27,7 +27,7 @@ void BLE_init()
     //ble_param.longitude = "Long:-121.121356 ";
 }
 
-void BLE_rx()
+void BLE_rx(void)
 {
     while(cgetChar(&ble_param.getdata,0))
      {
@@ -48,7 +48,7 @@ void BLE_rx()
     }
 }
 
-void BLE_tx()
+void BLE_tx(void)
 {
     Clear_Display();
     cputline(ble_param.latitude,10); //Adjust Delay as per data length
@@ -58,7 +58,7 @@ void BLE_tx()
     //printf("%s",ble_param.longitude);
 }
 
-void check_for_data_on_ble()
+void check_for_data_on_ble(void)
 {
     BLE_rx();
 }

@@ -13,6 +13,8 @@ extern "C" {
 #endif
 
 void service_sensor_msg(void);
+void service_sensor_hbt_msg(void);
+
 
 #ifdef __cplusplus
 }

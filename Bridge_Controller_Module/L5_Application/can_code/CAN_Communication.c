@@ -2,7 +2,7 @@
 #include "can.h"
 #include <stdio.h>
 #include "CAN_Communication.h"
-#include <Bridge_Module/ble_hc05.h>
+#include "../Bridge_Module/ble_hc05.h"
 
 
 COMPASS_t compass_data ={0};

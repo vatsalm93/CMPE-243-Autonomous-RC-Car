@@ -18,9 +18,9 @@ extern "C" {
 #define FIRMWARE_VERSION    "1.00"
 
 
-void BLE_init();
-void check_for_data_on_ble();
-void BLE_tx();
+void BLE_init(void);
+void check_for_data_on_ble(void);
+void BLE_tx(void);
 
 enum dataFromApp {
     STOP_CMD = 0,

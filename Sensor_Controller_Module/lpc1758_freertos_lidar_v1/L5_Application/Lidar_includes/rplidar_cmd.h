@@ -1,39 +1,3 @@
-/*
- * Copyright (c) 2014, RoboPeak
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, 
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice, 
- *    this list of conditions and the following disclaimer in the documentation 
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
-/*
- *  RoboPeak LIDAR System
- *  Data Packet IO packet definition for RP-LIDAR
- *
- *  Copyright 2009 - 2014 RoboPeak Team
- *  http://www.robopeak.com
- *  
- */
-
 
 #pragma once
 
@@ -43,16 +7,18 @@
 //-----------------------------------------
 
 //DIVIDE INTO ANGLES
-//#define Obstacle_FRONT0_start_range 340
-//#define Obstacle_FRONT0_end_range 359
-//#define Obstacle_FRONT1_start_range 0
-//#define Obstacle_FRONT1_end_range 15
-//#define Obstacle_RIGHT_start_range 15
-//#define Obstacle_RIGHT_end_range 45
-//#define Obstacle_LEFT_start_range 285
-//#define Obstacle_LEFT_end_range 340
-//#define Obstacle_BACK_start_range 165
-//#define Obstacle_BACK_end_range 195
+#if 0
+#define Obstacle_FRONT0_start_range 340
+#define Obstacle_FRONT0_end_range 359
+#define Obstacle_FRONT1_start_range 0
+#define Obstacle_FRONT1_end_range 15
+#define Obstacle_RIGHT_start_range 15
+#define Obstacle_RIGHT_end_range 60
+#define Obstacle_LEFT_start_range 285
+#define Obstacle_LEFT_end_range 340
+#define Obstacle_BACK_start_range 165
+#define Obstacle_BACK_end_range 195
+
 
 #define Obstacle_FRONT0_start_range 0
 #define Obstacle_FRONT0_end_range 5
@@ -64,6 +30,23 @@
 #define Obstacle_LEFT_end_range 335
 #define Obstacle_BACK_start_range 140
 #define Obstacle_BACK_end_range 200
+#endif
+
+
+#define DEGREES10  (10.0)
+#define DEGREES20  (20.0)
+#define DEGREES45  (45.0)
+#define DEGREES90     (90.0)
+#define DEGREES120  (120.0)
+#define DEGREES150  (150.0)
+#define DEGREES180  (180.0)
+#define DEGREES210  (210.0)
+#define DEGREES240  (240.0)
+#define DEGREES270  (270.0)
+#define DEGREES315     (315.0)
+#define DEGREES335  (335.0)
+#define DEGREES345 (345.0)
+#define DEGREES355 (355.0)
 
 // Commands without payload and response
 #define RPLIDAR_CMD_STOP               0x25
@@ -96,6 +79,27 @@
 #define RPLIDAR_RESP_MEASUREMENT_QUALITY_SHIFT  2
 #define RPLIDAR_RESP_MEASUREMENT_CHECKBIT       (0x1<<0)
 #define RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT    1
+
+// RP-Lidar Input Packets
+#define RPLIDAR_CMD_SYNC_BYTE        0xA5
+#define RPLIDAR_CMDFLAG_HAS_PAYLOAD  0x80
+#define RPLIDAR_ANS_SYNC_BYTE1       0xA5
+#define RPLIDAR_ANS_SYNC_BYTE2       0x5A
+#define RPLIDAR_ANS_PKTFLAG_LOOP     0x1
+
+//Results types
+#define RESULT_OK              0
+#define RESULT_FAIL_BIT        0x80000000
+#define RESULT_ALREADY_DONE    0x20
+#define RESULT_INVALID_DATA    (0x8000 | RESULT_FAIL_BIT)
+#define RESULT_OPERATION_FAIL  (0x8001 | RESULT_FAIL_BIT)
+#define RESULT_OPERATION_TIMEOUT  (0x8002 | RESULT_FAIL_BIT)
+#define RESULT_OPERATION_STOP    (0x8003 | RESULT_FAIL_BIT)
+#define RESULT_OPERATION_NOT_SUPPORT    (0x8004 | RESULT_FAIL_BIT)
+#define RESULT_FORMAT_NOT_SUPPORT    (0x8005 | RESULT_FAIL_BIT)
+#define RESULT_INSUFFICIENT_MEMORY   (0x8006 | RESULT_FAIL_BIT)
+#define IS_OK(x)    ( ((x) & RESULT_FAIL_BIT) == 0 )
+#define IS_FAIL(x)  ( ((x) & RESULT_FAIL_BIT) )
 
 typedef struct _rplidar_response_measurement_node_t {
     uint8_t    sync_quality;      // syncbit:1;syncbit_inverse:1;quality:6;

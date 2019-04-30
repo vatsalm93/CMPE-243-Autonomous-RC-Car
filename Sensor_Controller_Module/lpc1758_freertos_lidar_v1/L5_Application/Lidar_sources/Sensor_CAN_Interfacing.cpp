@@ -17,8 +17,8 @@
 
 #define SENSOR_CAN_BUS      can1
 #define SENSOR_BAUD_RATE    100
-#define SENSOR_RX_Q         100
-#define SENSOR_TX_Q         100
+#define SENSOR_RX_Q         10
+#define SENSOR_TX_Q         10
 
 extern SENSOR_NODE_t sensor_cmd;
 extern sensor_lv_max_sonar_t send_ultrasonic_data;
@@ -37,16 +37,15 @@ bool sensor_can_init()
     return status;
 }
 
-bool sensor_send_data(void)
+bool sensor_send_data(RPLidarRotation *singleRotation)
 {
-    sensor_cmd.SENSOR_FRONT_cm = send_ultrasonic_data.distance;
+    sensor_cmd.SENSOR_FRONT_cm = 200.0;////send_ultrasonic_data.distance;
+
     can_msg_t can_msg = {0};
-    u0_dbg_printf("sensor data %x\n",sensor_cmd);
     dbc_msg_hdr_t can_msg_hdr = dbc_encode_SENSOR_NODE(can_msg.data.bytes, &sensor_cmd);
-   // dbc_msg_hdr_t dbc_msg_hdr_t = SENSOR_DEBUG_HDR(can_msg.data.bytes, &debug_msg);
     can_msg.msg_id = can_msg_hdr.mid;
     can_msg.frame_fields.data_len = can_msg_hdr.dlc;
-    bool flag = CAN_tx(SENSOR_CAN_BUS, &can_msg, 0);
+    bool flag = CAN_tx(SENSOR_CAN_BUS, &can_msg, 2);
     debug_msg.IO_DEBUG_CAN_TX = flag;
     return flag;
 }

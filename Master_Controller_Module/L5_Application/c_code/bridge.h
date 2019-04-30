@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 void service_bridge_msg(void);
+void service_bridge_hbt_msg(void);
 
 #ifdef __cplusplus
 }

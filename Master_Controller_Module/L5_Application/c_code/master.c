@@ -5,7 +5,7 @@
  *      Author: Aakash
  */
 #include "can.h"
-#include "c_code/externs.h"
+#include "../../_can_dbc/generated_can.h"
 #include "c_code/defines.h"
 #include "c_code/bridge.h"
 #include "c_code/sensor.h"
@@ -13,7 +13,9 @@
 #include "c_code/master.h"
 #include "c_code/structures.h"
 #include "c_code/compass.h"
+#include "c_code/motor.h"
 #include "c_code/c_io.h"
+#include <stdio.h>
 
 BRIDGE_NODE_t bridge_data = {0, {0}};
 SENSOR_NODE_t sensor_data = {0};
@@ -57,197 +59,129 @@ bool bus_off_flag = false;
 bool start_free_run_flag = false;
 bool free_run_motor_flag = false;
 bool free_steer_flag = false;
+bool check_rear_obstacle = false;
 
 void master_controller_init(void)
 {
     do {
-        can_init_flag = CAN_init(CAN_BUS, CAN_BAUD_RATE, 10, 10, 0, 0);
+        can_init_flag = CAN_init(CAN_BUS, CAN_BAUD_RATE, CAN_RX_QUEUE_SIZE, CAN_TX_QUEUE_SIZE, 0, 0);
     } while(false == can_init_flag);
 
     CAN_bypass_filter_accept_all_msgs();
     CAN_reset_bus(CAN_BUS);
 }
 
-void start_obstacle_detection(obstacle_detection_t *obs_detection)
+void start_obstacle_avoidance()
 {
     uint16_t front_sensor = sensor_data.SENSOR_FRONT_cm;
-    uint8_t obs_front = sensor_data.LIDAR_Obstacle_FRONT;
+//    uint8_t obs_front = sensor_data.LIDAR_Obstacle_FRONT;
     uint8_t obs_left = sensor_data.LIDAR_Obstacle_LEFT;
     uint8_t obs_right = sensor_data.LIDAR_Obstacle_RIGHT;
     uint8_t obs_back = sensor_data.LIDAR_Obstacle_BACK;
-    obs_detection->no_obstacle = true;
-    obs_detection->front = false;
-    obs_detection->frontleft = false;
-    obs_detection->frontright = false;
-    obs_detection->rear = false;
-    obs_detection->rearleft = false;
-    obs_detection->rearright = false;
 
-    //front obstacle
-    if (((obs_front > 0) && (obs_front < OBSTACLE_TRACK_THRESHOLD)) || (front_sensor < 100))
+    // no obstacle
+    if ((obs_left >= OBSTACLE_TRACK_THRESHOLD) && (obs_right >= OBSTACLE_TRACK_THRESHOLD)
+            && (front_sensor >= ULTRASONIC_THRESHOLD))
     {
-        obs_detection->no_obstacle = false;
-        obs_detection->front = true;
+        drive_motor_fwd_med();
+        master_dont_steer();
+        check_rear_obstacle = false;
     }
-
-    //front-left obstacle
-    if ((obs_left > 0) && (obs_left < OBSTACLE_TRACK_THRESHOLD + 1))
+    // only front obstacle
+    else if ((obs_left >= OBSTACLE_TRACK_THRESHOLD) && (obs_right >= OBSTACLE_TRACK_THRESHOLD)
+            && (front_sensor < ULTRASONIC_THRESHOLD))
     {
-        obs_detection->no_obstacle = false;
-        obs_detection->frontleft = true;
-    }
-
-    //front-right obstacle
-    if ((obs_right > 0) && (obs_right < OBSTACLE_TRACK_THRESHOLD + 1))
-    {
-        obs_detection->no_obstacle = false;
-        obs_detection->frontright = true;
-    }
-
-    //Rear obstacle
-    if ((obs_back > 0) && (obs_back < OBSTACLE_TRACK_THRESHOLD - 1)) // did -1 because lidar is not in center
-    {
-        obs_detection->no_obstacle = false;
-        obs_detection->rear = true;
-    }
-
-//    //front clearance check
-//    //for front right
-    if((obs_detection->front && obs_front < CLEARANCE_TRACK_THRESHOLD) && !obs_detection->frontright)
-    {
-        obs_detection->frontright = true;
-        obs_detection->no_obstacle = false;
-    }
-
-    if((obs_detection->front && obs_front < CLEARANCE_TRACK_THRESHOLD) && !obs_detection->frontleft)
-    {
-        obs_detection->frontleft = true;
-        obs_detection->no_obstacle = false;
-    }
-}
-
-void start_obstacle_avoidance(obstacle_detection_t obs_detected)
-{
-    if (obs_detected.no_obstacle == true)
-    {
-        car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
-        car_control.MOTOR_STEER_cmd = MOTOR_DONT_STEER;
-        car_control.MOTOR_kph = MOTOR_SLOW_KPH;
-    }
-    else
-    {
-        if ((obs_detected.front == true) && (obs_detected.frontleft == true) && (obs_detected.frontright == true))
+        drive_motor_fwd_slow();
+        if ((obs_left < obs_right))
         {
-            //check reverse
-            if (obs_detected.rear == true)
-            {
-                car_control.MOTOR_DRIVE_cmd = MOTOR_STOP;
-                car_control.MOTOR_STEER_cmd = MOTOR_DONT_STEER;
-                car_control.MOTOR_kph = MOTOR_STOP_KPH;
-            }
-            else
-            {
-                car_control.MOTOR_DRIVE_cmd = MOTOR_REV;
-                car_control.MOTOR_STEER_cmd = MOTOR_DONT_STEER;
-                car_control.MOTOR_kph = MOTOR_SLOW_KPH;
-            }
+            master_steer_full_right();
         }
-        else if ((obs_detected.front == true) && (obs_detected.frontleft == true))
+        else if ((obs_left > obs_right))
         {
-            car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
-            car_control.MOTOR_STEER_cmd = MOTOR_STEER_FULL_RIGHT;
-            car_control.MOTOR_kph = MOTOR_SLOW_KPH;
-        }
-        else if ((obs_detected.front == true) && (obs_detected.frontright == true))
-        {
-            car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
-            car_control.MOTOR_STEER_cmd = MOTOR_STEER_FULL_LEFT;
-            car_control.MOTOR_kph = MOTOR_SLOW_KPH;
+            master_steer_full_left();
         }
         else
         {
-            if (obs_detected.frontleft == true)
-            {
-                car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
-                car_control.MOTOR_STEER_cmd = MOTOR_STEER_SLIGHT_RIGHT;
-                car_control.MOTOR_kph = MOTOR_SLOW_KPH;
-            }
-            else if (obs_detected.frontright == true)
-            {
-                car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
-                car_control.MOTOR_STEER_cmd = MOTOR_STEER_SLIGHT_LEFT;
-                car_control.MOTOR_kph = MOTOR_SLOW_KPH;
-            }
-            else if (obs_detected.front == true)
-            {
-                car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
-                car_control.MOTOR_STEER_cmd = MOTOR_STEER_FULL_RIGHT;
-                car_control.MOTOR_kph = MOTOR_SLOW_KPH;
-            }
-            else
-            {
-                car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
-                car_control.MOTOR_STEER_cmd = MOTOR_DONT_STEER;
-                car_control.MOTOR_kph = MOTOR_SLOW_KPH;
-            }
+            master_steer_full_left();
+        }
+        check_rear_obstacle = false;
+    }
+    // only left obstacle
+    else if ((obs_left < OBSTACLE_TRACK_THRESHOLD) && (obs_right >= OBSTACLE_TRACK_THRESHOLD)
+            && (front_sensor >= ULTRASONIC_THRESHOLD))
+    {
+        drive_motor_fwd_slow();
+        master_steer_slight_right();
+        check_rear_obstacle = false;
+    }
+    // only right obstacle
+    else if ((obs_left >= OBSTACLE_TRACK_THRESHOLD) && (obs_right < OBSTACLE_TRACK_THRESHOLD)
+            && (front_sensor >= ULTRASONIC_THRESHOLD))
+    {
+        drive_motor_fwd_slow();
+        master_steer_slight_left();
+        check_rear_obstacle = false;
+    }
+    // front and left obstacle
+    else if ((obs_left < OBSTACLE_TRACK_THRESHOLD) && (obs_right >= OBSTACLE_TRACK_THRESHOLD)
+            && (front_sensor < ULTRASONIC_THRESHOLD))
+    {
+        drive_motor_fwd_slow();
+        master_steer_full_right();
+        check_rear_obstacle = false;
+    }
+    // front and right obstacle
+    else if ((obs_left >= OBSTACLE_TRACK_THRESHOLD) && (obs_right < OBSTACLE_TRACK_THRESHOLD)
+            && (front_sensor < ULTRASONIC_THRESHOLD))
+    {
+        drive_motor_fwd_slow();
+        master_steer_full_left();
+        check_rear_obstacle = false;
+    }
+    // left and right obstacle
+    else if ((obs_left < OBSTACLE_TRACK_THRESHOLD) && (obs_right < OBSTACLE_TRACK_THRESHOLD)
+            && (front_sensor >= ULTRASONIC_THRESHOLD))
+    {
+        if ((obs_left < obs_right))
+        {
+            drive_motor_fwd_slow();
+            master_steer_slight_right();
+        }
+        else if ((obs_left > obs_right))
+        {
+            drive_motor_fwd_slow();
+            master_steer_slight_left();
+        }
+        else
+        {
+            drive_motor_fwd_slow();
+            master_dont_steer();
+        }
+        check_rear_obstacle = false;
+    }
+    // left, right and front obstacle
+    else if ((obs_left < OBSTACLE_TRACK_THRESHOLD) && (obs_right < OBSTACLE_TRACK_THRESHOLD)
+            && (front_sensor < ULTRASONIC_THRESHOLD) && (!check_rear_obstacle))
+    {
+        drive_motor_stop();
+        master_dont_steer();
+        check_rear_obstacle = true;
+    }
+    // If left, front and right have obstacle;
+    // check for rear obstacle
+    else if (check_rear_obstacle)
+    {
+        if (obs_back < OBSTACLE_TRACK_THRESHOLD - 1)
+        {
+            drive_motor_stop();
+            master_dont_steer();
+        }
+        else
+        {
+            drive_motor_rev_slow();
+            master_dont_steer();
         }
     }
-}
-
-
- inline void drive_motor_fwd_slow(void)
-{
-    car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
-    car_control.MOTOR_kph = MOTOR_SLOW_KPH;
-}
-
- inline void drive_motor_fwd_med(void)
-{
-    car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
-    car_control.MOTOR_kph = MOTOR_MED_KPH;
-}
-
- inline void drive_motor_fwd_fast(void)
-{
-    car_control.MOTOR_DRIVE_cmd = MOTOR_FORWARD;
-    car_control.MOTOR_kph = MOTOR_FAST_KPH;
-}
-
- inline void drive_motor_rev_slow(void)
-{
-    car_control.MOTOR_DRIVE_cmd = MOTOR_REV;
-    car_control.MOTOR_kph = MOTOR_SLOW_KPH;
-}
-
- inline void drive_motor_stop(void)
-{
-    car_control.MOTOR_DRIVE_cmd = MOTOR_STOP;
-    car_control.MOTOR_kph = MOTOR_STOP_KPH;
-}
-
- inline void master_steer_full_left(void)
-{
-    car_control.MOTOR_STEER_cmd = MOTOR_STEER_FULL_LEFT;
-}
-
- inline void master_steer_full_right(void)
-{
-    car_control.MOTOR_STEER_cmd = MOTOR_STEER_FULL_RIGHT;
-}
-
- inline void master_steer_slight_left(void)
-{
-    car_control.MOTOR_STEER_cmd = MOTOR_STEER_SLIGHT_LEFT;
-}
-
- inline void master_steer_slight_right(void)
-{
-    car_control.MOTOR_STEER_cmd = MOTOR_STEER_SLIGHT_RIGHT;
-}
-
- inline void master_dont_steer(void)
-{
-    car_control.MOTOR_STEER_cmd = MOTOR_DONT_STEER;
 }
 
 void master_service_can_msgs(void)
@@ -327,12 +261,6 @@ void master_mia_handler(void)
 bool hbt_sync_from_all_node(void)
 {
     return (sensor_hbt_sync & motor_hbt_sync & gps_hbt_sync & bridge_hbt_sync);
-}
-
-void service_motor_hbt_msg(void)
-{
-    dbc_decode_MOTOR_HEARTBEAT(&motor_hbt, can_msg.data.bytes, &can_msg_hdr);
-    motor_hbt_sync = motor_hbt.MOTOR_hbt;
 }
 
 void master_send_command_to_motor_module(void)

@@ -27,7 +27,7 @@ void setLCD_Right(char num)
     LD.setRightDigit(num);
 }
 
-void Clear_Display()
+void Clear_Display(void)
 {
     LD.clear();
 }
