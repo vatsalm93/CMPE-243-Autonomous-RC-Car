@@ -39,7 +39,7 @@ bool sensor_can_init()
 
 bool sensor_send_data(RPLidarRotation *singleRotation)
 {
-    sensor_cmd.SENSOR_FRONT_cm = 200.0;////send_ultrasonic_data.distance;
+    sensor_cmd.SENSOR_FRONT_cm = send_ultrasonic_data.distance;
 
     can_msg_t can_msg = {0};
     dbc_msg_hdr_t can_msg_hdr = dbc_encode_SENSOR_NODE(can_msg.data.bytes, &sensor_cmd);

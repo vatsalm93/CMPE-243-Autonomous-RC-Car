@@ -43,7 +43,7 @@
 #define DEGREES210  (210.0)
 #define DEGREES240  (240.0)
 #define DEGREES270  (270.0)
-#define DEGREES315     (315.0)
+#define DEGREES315     (290.0)
 #define DEGREES335  (335.0)
 #define DEGREES345 (345.0)
 #define DEGREES355 (355.0)
