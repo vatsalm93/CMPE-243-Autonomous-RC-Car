@@ -28,7 +28,7 @@ bool C_period_init(void) {
     setPin();
     setInput();
 
-    lpc_timer_enable(lpc_timer3, 1000);
+//    lpc_timer_enable(lpc_timer3, 1000);
     eint3_enable_port2(6, eint_falling_edge, eint3_handler);
 
     lcd_init();

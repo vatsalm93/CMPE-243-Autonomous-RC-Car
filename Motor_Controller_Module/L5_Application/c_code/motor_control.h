@@ -18,8 +18,6 @@
 extern "C" {
 #endif
 
-extern float fw_pwm_val_motor;
-
 void command_motor(CAR_CONTROL_t *drive_motor);
 void command_servo(CAR_CONTROL_t *drive_motor);
 void forward_speed_control(CAR_CONTROL_t *drive_forward);
