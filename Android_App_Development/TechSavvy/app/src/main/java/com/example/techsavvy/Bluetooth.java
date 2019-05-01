@@ -38,7 +38,14 @@ public class Bluetooth extends AppCompatActivity {
 
     // GUI Components
     private TextView mBluetoothStatus;
-    private TextView mReadBuffer;
+    //private TextView mReadBuffer;
+    private static TextView mdriveCmd;
+    private static TextView msteerCmd;
+    private static TextView mrpm;
+    private static TextView mobsFront;
+    private static TextView mobsRight;
+    private static TextView mobsLeft;
+    private static TextView mobsBack;
     private static TextView mlatitude;
     private static TextView mlongitude;
     private static TextView mcompass;
@@ -78,10 +85,17 @@ public class Bluetooth extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        mReadBuffer = (TextView) findViewById(R.id.readBuffer);
+        //mReadBuffer = (TextView) findViewById(R.id.readBuffer);
         mlatitude = (TextView) findViewById(R.id.lat_rx);
         mlongitude = (TextView) findViewById(R.id.long_rx);
         mcompass = (TextView) findViewById(R.id.compass_rx);
+        mdriveCmd =(TextView) findViewById(R.id.motor_drive_rx);
+         msteerCmd=(TextView) findViewById(R.id.motor_steer_rx);
+       mrpm=(TextView) findViewById(R.id.rpm_rx);
+        mobsFront=(TextView) findViewById(R.id.obsFront_rx);
+        mobsRight=(TextView) findViewById(R.id.obsRight_rx);
+       mobsLeft=(TextView) findViewById(R.id.obsLeft_rx);
+        mobsBack=(TextView) findViewById(R.id.obsBack_rx);
         mStart = (CheckBox)findViewById(R.id.start);
 
         mBTArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
@@ -107,7 +121,7 @@ public class Bluetooth extends AppCompatActivity {
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-                    mReadBuffer.setText(readMessage);
+                    //mReadBuffer.setText(readMessage);
                     stringParse(readMessage);
                 }
                 if(msg.what == CONNECTING_STATUS){
@@ -189,6 +203,35 @@ public class Bluetooth extends AppCompatActivity {
                     {
                         //mcompass_rx = Float.parseFloat(value);
                         mcompass.setText(value);
+                    }
+                    else if(item.equalsIgnoreCase("DrvCmd"))
+                    {
+                        mdriveCmd.setText(value);
+                    }
+                    else if(item.equalsIgnoreCase("RPM"))
+                    {
+                        mrpm.setText(value);
+                    }
+
+                    else if(item.equalsIgnoreCase("StrCmd"))
+                    {
+                        msteerCmd.setText(value);
+                    }
+                    else if(item.equalsIgnoreCase("ObsFront"))
+                    {
+                        mobsFront.setText(value);
+                    }
+                    else if(item.equalsIgnoreCase("ObsRight"))
+                    {
+                        mobsRight.setText(value);
+                    }
+                    else if(item.equalsIgnoreCase("ObsLeft"))
+                    {
+                        mobsLeft.setText(value);
+                    }
+                    else if(item.equalsIgnoreCase("ObsBack"))
+                    {
+                        mobsBack.setText(value);
                     }
 
                 }
@@ -316,6 +359,7 @@ public class Bluetooth extends AppCompatActivity {
             // Get the input and output streams, using temp objects because
             // member streams are final
             try {
+
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) { }
@@ -325,7 +369,7 @@ public class Bluetooth extends AppCompatActivity {
         }
 
         public void run() {
-            byte[] buffer = new byte[1024];  // buffer store for the stream
+            byte[] buffer = new byte[8192];  // buffer store for the stream
             int bytes; // bytes returned from read()
             // Keep listening to the InputStream until an exception occurs
             while (true) {
@@ -333,8 +377,8 @@ public class Bluetooth extends AppCompatActivity {
                     // Read from the InputStream
                     bytes = mmInStream.available();
                     if(bytes != 0) {
-                        buffer = new byte[4096];
-                        SystemClock.sleep(1000); //pause and wait for rest of data. Adjust this depending on your sending speed.
+                        buffer = new byte[8192];
+                        SystemClock.sleep(100); //pause and wait for rest of data. Adjust this depending on your sending speed.
                         bytes = mmInStream.available(); // how many bytes are ready to be read?
                         bytes = mmInStream.read(buffer, 0, bytes); // record how many bytes we actually read
                         mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)

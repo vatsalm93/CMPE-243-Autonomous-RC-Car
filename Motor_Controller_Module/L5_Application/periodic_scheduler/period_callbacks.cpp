@@ -29,8 +29,10 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "periodic_callback.h"
 #include "c_period_callbacks.h"
+
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
 const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
 /**
@@ -49,7 +51,7 @@ bool period_init(void) {
 /// Register any telemetry variables
 bool period_reg_tlm(void){
     // Make sure "SYS_CFG_ENABLE_TLM" is enabled at sys_config.h to use Telemetry
-    return C_period_reg_tlm(); // Must return true upon success
+    return true; // Must return true upon success
 }
 
 
@@ -63,12 +65,12 @@ void period_1Hz(uint32_t count) {
 }
 
 void period_10Hz(uint32_t count) {
-
     C_period_10Hz(count);
 }
 
 void period_100Hz(uint32_t count) {
     C_period_100Hz(count);
+
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():

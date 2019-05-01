@@ -3,18 +3,22 @@ package com.example.techsavvy;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     private GoogleMap mMap;
+
+    double srcLat, srcLng, dstLat, dstLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,29 +36,70 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        //mMap2 = googleMap;
+        mMap.setOnMapLongClickListener(this);
+
         Intent intent = getIntent();
         //Get Longitude and Latitude Values
-        double latitude = intent.getDoubleExtra("latitude", 37.3352);
-        double longitude = intent.getDoubleExtra("longitude", -121.8811);
+        srcLat = intent.getDoubleExtra("latitude", 37.3352);
+        srcLng = intent.getDoubleExtra("longitude", -121.8811);
+
+        if(srcLat < 5.00 || srcLng < 5.00){
+            srcLat = 37.3352;
+            srcLng = -121.8811;
+        }
+
+        //Create Obj Location
+        LatLng sourceLocation = new LatLng(srcLat , srcLng);
 
         //Round value to 2-decimal to test accuracy of GPS location
         //https://stackoverflow.com/questions/5945867/how-to-round-the-double-value-to-2-decimal-points
-        double lat2Dec = (Math.round(latitude * 100.0))/100.0;
-        double long2Dec = (Math.round(longitude * 100.0))/100.0;
-
-        latitude = lat2Dec;
-        longitude = long2Dec;
+        double lat2Dec = (Math.round(srcLat * 100.0))/100.0;
+        double long2Dec = (Math.round(srcLat * 100.0))/100.0;
 
         //Convert to string for logging the values
-        String latitudeStr = String.valueOf(latitude);
-        String longitudeStr = String.valueOf(longitude);
-
+        String latitudeStr = String.valueOf(srcLat);
+        String longitudeStr = String.valueOf(srcLat);
         String markerDisplay = "Lat: " + latitudeStr + "   Long: " + longitudeStr;
         Toast.makeText(this, markerDisplay, Toast.LENGTH_LONG).show();
 
-        // Add a marker in Sydney and move the camera
-        LatLng SJSU = new LatLng(latitude , longitude);
-        mMap.addMarker(new MarkerOptions().position(SJSU).title(markerDisplay));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SJSU, 15));
+        // Add a marker and move the camera
+        mMap.addMarker(new MarkerOptions().position(sourceLocation).title(markerDisplay));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sourceLocation, 15));
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        //Clear Map to remove previous markers
+        mMap.clear();
+        dstLat = latLng.latitude;
+        dstLng = latLng.longitude;
+
+        //Round value to 2-decimal to test accuracy of GPS location
+        //https://stackoverflow.com/questions/5945867/how-to-round-the-double-value-to-2-decimal-points
+        double lat2Dec = (Math.round(dstLat * 100.0))/100.0;
+        double long2Dec = (Math.round(dstLng * 100.0))/100.0;
+
+        //Convert to string for logging the values
+        String latitudeStr = String.valueOf(dstLat);
+        String longitudeStr = String.valueOf(dstLng);
+        String toastDisplay = "Dest - Lat: " + latitudeStr + "   Long: " + longitudeStr;
+        Toast.makeText(this, toastDisplay, Toast.LENGTH_LONG).show();
+
+        // Add source marker
+        LatLng Source = new LatLng(srcLat , srcLng);
+        mMap.addMarker(new MarkerOptions().position(Source).title("Source"));
+
+        //Add destination marker.. Make it Green color
+        latitudeStr = String.valueOf(lat2Dec);
+        longitudeStr = String.valueOf(long2Dec);
+        String markerDisplay = "Dest - Lat: " + latitudeStr + "   Long: " + longitudeStr;
+        mMap.addMarker(new MarkerOptions().position(latLng).title(markerDisplay).icon(BitmapDescriptorFactory
+                .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+    }
+
+    public void startButton2OnClick(View view) {
+        Toast.makeText(this, "Button pressed", Toast.LENGTH_LONG).show();
     }
 }
+

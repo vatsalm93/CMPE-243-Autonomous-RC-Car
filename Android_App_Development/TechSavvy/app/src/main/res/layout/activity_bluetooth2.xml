@@ -42,29 +42,157 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
-
             <TextView
-                android:layout_width="80dp"
+                android:layout_width="130dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.1"
                 android:ellipsize="end"
                 android:maxLines="5"
-                android:text="RX:"
+                android:text="Motor Drive CMD :"
                 android:textStyle="bold" />
-
             <TextView
-                android:id="@+id/readBuffer"
-                android:layout_width="300dp"
-                android:layout_height="match_parent"
-                android:layout_centerHorizontal="true"
-                android:layout_weight="0.9"
+                android:id="@+id/motor_drive_rx"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:text="&lt;Read Buffer>" />
+                android:text="&lt; Drive Command >" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="130dp"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:maxLines="5"
+                android:text="Motor Steer CMD :"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/motor_steer_rx"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="&lt; Steer Command >" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:maxLines="5"
+                android:text="RPM : "
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/rpm_rx"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="&lt;RPM>" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="110dp"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:maxLines="5"
+                android:text="Obstacle Front :"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/obsFront_rx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="&lt;Front>" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="110dp"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:maxLines="5"
+                android:text="Obstacle Right :"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/obsRight_rx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="&lt;Right>" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="110dp"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:maxLines="5"
+                android:text="Obstacle Left :"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/obsLeft_rx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="&lt;Left>" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="110dp"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:maxLines="5"
+                android:text="Obstacle Back :"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/obsBack_rx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="&lt;Back>" />
         </LinearLayout>
 
         <LinearLayout
@@ -81,7 +209,7 @@
                 android:textStyle="bold" />
         <TextView
             android:id="@+id/lat_rx"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:baselineAligned="false"
             android:ellipsize="end"
@@ -90,7 +218,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
@@ -103,7 +231,7 @@
                 android:textStyle="bold" />
             <TextView
                 android:id="@+id/long_rx"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:baselineAligned="false"
                 android:ellipsize="end"
@@ -111,12 +239,12 @@
                 android:text="&lt;Longitude>" />
         </LinearLayout>
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="80dp"
+                android:layout_width="70dp"
                 android:layout_height="match_parent"
                 android:ellipsize="end"
                 android:maxLines="5"

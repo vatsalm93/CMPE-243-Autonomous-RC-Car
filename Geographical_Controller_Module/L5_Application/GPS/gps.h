@@ -11,6 +11,7 @@
 extern "C" {
 #endif
 #include <stdint.h>
+#include <stdbool.h>
 
 #define UART2_BAUD_RATE  57600  ///< Baud rate you wish to use (it will auto-detect and change to this)
 #define UART_RECEIVE_BUFFER_SIZE 120
@@ -21,6 +22,9 @@ void check_for_data_on_gps(void);
 void gps_tx(void);
 float getLatitude(void);
 float getLongitude(void);
+bool gps_parse_data(void);
+void create_gps_config(void);
+void gps_rx(void);
 
 // different commands to set the update rate from once a second (1 Hz) to 10 times a second (10Hz)
 // Note that these only control the rate at which the position is echoed, to actually speed up the
@@ -30,6 +34,7 @@ float getLongitude(void);
 // turn on only the second sentence (GPRMC)
 #define PMTK_SET_NMEA_OUTPUT_RMCONLY "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29"
 #define PMTK_SET_BAUD_57600 "$PMTK251,57600*2C"
+#define PMTK_API_SET_FIX_CTL_1HZ  "$PMTK300,1000,0,0,0,0*1C"
 
 #if 0
 // Position fix update rate commands.
@@ -81,11 +86,10 @@ float getLongitude(void);
 #define MAXWAITSENTENCE 10
 #endif
 
-
-/* The buffer for reading GPS messages. */
-char gps_line[UART_RECEIVE_BUFFER_SIZE];
-float latitude;
-float longitude;
+    /* The buffer for reading GPS messages. */
+    char gps_line[UART_RECEIVE_BUFFER_SIZE];
+    float latitude;
+    float longitude;
 
 #ifdef __cplusplus
 }

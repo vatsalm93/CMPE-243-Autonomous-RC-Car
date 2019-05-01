@@ -138,4 +138,13 @@ class periodicSchedulerTask : public scheduler_task
         const uint8_t mKHz; // Periodic dispatcher should use 1Khz callback too
 };
 
+class lcd_task : public scheduler_task
+{
+public:
+    lcd_task(uint8_t priority);
+    bool init(void);
+    bool run(void *p);
+
+};
+
 #endif /* TASKS_HPP_ */

@@ -9,6 +9,7 @@
 #include "c_io.h"
 #include "utilities.h"
 #include "c_i2c_base.h"
+#include <stdio.h>
 
 float Compass_Get_Bearing_Angle(void)
 {
@@ -23,6 +24,7 @@ float Compass_Get_Bearing_Angle(void)
         bearing_int <<= 8;
         bearing_int += buffer[1];
         bearing_float = (float)(bearing_int/10.00);
+        //printf("%f\n",bearing_float);
        // bearing_float = bearing_float + COMPASS_OFFSET;
         return bearing_float;
     }
