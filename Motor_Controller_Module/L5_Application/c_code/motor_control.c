@@ -8,9 +8,9 @@
 #include "motor_control.h"
 #include "printf_lib.h"
 
-#define STEP_UPHILL 0.0002
-#define STEP_DOWNHILL 0.0004
-#define SPEED_LIMIT 16.10
+#define STEP_UPHILL 0.002
+//#define STEP_DOWNHILL 0.0004
+#define SPEED_LIMIT 16.05
 #define STOP 15.00
 #define REVERSE 14.2
 #define FORWARD_START 15.7
@@ -23,7 +23,7 @@
 
 CAR_CONTROL_t drive = {2, 2, 0.00, {0}};
 
-static float fw_pwm_val_motor = 15.7;
+float fw_pwm_val_motor = 15.7000000;
 static bool fw_flag = false;
 
 static uint32_t reverse_count = 0;
@@ -72,7 +72,7 @@ void command_servo(CAR_CONTROL_t *drive_servo){
             break;
         case MOTOR_STEER_SLIGHT_RIGHT:
             set_pwm_value(servo_2, SLIGHT_RIGHT);
-            setLED(3,1);
+            //setLED(3,1);
             break;
         case MOTOR_STEER_FULL_RIGHT:
             set_pwm_value(servo_2, HARD_RIGHT);
@@ -83,29 +83,30 @@ void command_servo(CAR_CONTROL_t *drive_servo){
 void forward_speed_control(CAR_CONTROL_t *drive_forward)
 {
     float speed = get_speed();
-    if (speed >= (drive_forward->MOTOR_kph + 1)) {
+    if (speed > (drive_forward->MOTOR_kph + 0.6)) {
         setLED(3, 1);
         fw_flag = true;
-        set_pwm_value(motor_1, STOP);
         fw_pwm_val_motor = STOP;
     }
-
     else {
+
         if (fw_pwm_val_motor > SPEED_LIMIT)
             fw_pwm_val_motor = SPEED_LIMIT;
 
-        if (speed < (drive_forward->MOTOR_kph) && fw_pwm_val_motor < SPEED_LIMIT) {
-            if (fw_flag == true) {
-                fw_pwm_val_motor = FORWARD_START;
-                fw_flag = false;
-            }
+        if (fw_flag == true) {
+            fw_pwm_val_motor = FORWARD_START;
+            fw_flag = false;
+        }
+//        printf("fw_pwm_val1: %f\n", fw_pwm_val_motor);
+        if((int)speed == 0) {
+            fw_pwm_val_motor += STEP_UPHILL + STEP_UPHILL + STEP_UPHILL;
+  //          printf("fw_pwm_val2: %f\n", fw_pwm_val_motor);
+        }
+        else if ((speed > 0) && (speed < (drive_forward->MOTOR_kph)) && (fw_pwm_val_motor < SPEED_LIMIT)) {
             fw_pwm_val_motor += STEP_UPHILL;
         }
-        if((int)speed == 0) {
-            fw_pwm_val_motor += STEP_UPHILL + STEP_UPHILL;
-        }
-        set_pwm_value(motor_1, fw_pwm_val_motor);
     }
+    set_pwm_value(motor_1, fw_pwm_val_motor);
 }
 
 void command_motor_reverse(void)
