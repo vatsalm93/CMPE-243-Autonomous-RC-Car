@@ -13,5 +13,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Bluetooth Configuration</string>
     <string name="map_button">Show Location on Map</string>
+    <string name="map_start_state">START</string>
+    <string name="map_stop_state">STOP</string>
     <string name="title_activity_maps">Map</string>
 </resources>

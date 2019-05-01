@@ -3,6 +3,7 @@ package com.example.techsavvy;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -95,6 +96,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String markerDisplay = "Dest - Lat: " + latitudeStr + "   Long: " + longitudeStr;
         mMap.addMarker(new MarkerOptions().position(latLng).title(markerDisplay).icon(BitmapDescriptorFactory
                 .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+    }
+
+    public void startButton2OnClick(View view) {
+        Toast.makeText(this, "Button pressed", Toast.LENGTH_LONG).show();
     }
 }
 

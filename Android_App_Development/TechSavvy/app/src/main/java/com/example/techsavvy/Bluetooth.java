@@ -359,6 +359,7 @@ public class Bluetooth extends AppCompatActivity {
             // Get the input and output streams, using temp objects because
             // member streams are final
             try {
+
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) { }
