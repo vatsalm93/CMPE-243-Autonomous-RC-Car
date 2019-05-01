@@ -73,6 +73,7 @@ void period_1Hz(uint32_t count)
 {
     sensor_CAN_turn_on_bus_if_bus_off();
     transmit_heartbeat_on_can();
+    send_sensor_debug_msg();
 }
 
 void period_10Hz(uint32_t count)

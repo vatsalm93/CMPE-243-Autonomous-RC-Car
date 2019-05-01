@@ -14,11 +14,6 @@ typedef struct
 
 typedef struct
 {
-/*    int sector_front;
-    int sector_front_left;
-    int sector_front_right;
-    int sector_rear;*/
-
     int s0;
     int s1;
     int s2;

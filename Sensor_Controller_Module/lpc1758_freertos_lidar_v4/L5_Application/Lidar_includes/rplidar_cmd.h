@@ -34,19 +34,16 @@
 
 
 #define DEGREES10  (10.0)
-#define DEGREES20  (20.0)
 #define DEGREES45  (45.0)
-#define DEGREES90     (90.0)
-#define DEGREES120  (120.0)
-#define DEGREES150  (150.0)
-#define DEGREES180  (180.0)
-#define DEGREES210  (210.0)
-#define DEGREES240  (240.0)
-#define DEGREES270  (270.0)
-#define DEGREES315     (290.0)
-#define DEGREES335  (335.0)
-#define DEGREES345 (345.0)
-#define DEGREES355 (355.0)
+#define DEGREES140  (140.0)
+#define DEGREES160  (160.0)
+#define DEGREES200  (200.0)
+#define DEGREES220  (220.0)
+#define DEGREES300  (300.0)
+#define DEGREES280 280.0
+#define DEGREES350 (350.0)
+#define DEGREES360 (360.0)
+
 
 // Commands without payload and response
 #define RPLIDAR_CMD_STOP               0x25
