@@ -75,12 +75,13 @@ void period_1Hz(uint32_t count)
     check_bus_off();
     transmit_heartbeat_on_can();
     transmit_debug_data_on_can();
+    get_compass_data();
 }
 
 void period_10Hz(uint32_t count)
 {
     check_for_data_on_gps();
-   // get_compass_data();
+
     // Send out Driver command at 10Hz
     transmit_compass_data_on_can();
 }

@@ -58,10 +58,6 @@ bool transmit_gps_data_on_can(void){
     can_msg.msg_id = msg_hdr.mid;
     can_msg.frame_fields.data_len = msg_hdr.dlc;
 
- /*   for (int i = 0; i < can_msg.frame_fields.data_len; i++) {
-                    printf("%#2X, ", can_msg.data.bytes[i]);
-    }*/
-
     // Queue the CAN message to be sent out
     return (CAN_tx(can1, &can_msg, 0));
 }
