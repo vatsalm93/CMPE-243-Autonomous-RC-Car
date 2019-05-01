@@ -18,6 +18,7 @@
 
 void create_gps_config(void)
 {
+    cputline(PMTK_SET_BAUD_57600,30);
     cputline(PMTK_SET_NMEA_OUTPUT_RMCONLY, 10);
     cputline(PMTK_SET_NMEA_UPDATE_10HZ, 10);
     cputline(PMTK_API_SET_FIX_CTL_5HZ, 10);
@@ -37,11 +38,7 @@ void gps_rx(void)
     {
         setLED(3,1);
     }
-  //  printf("%s",gps_line);
- /*   else
-    {
-        setLED(3,0);
-    }*/
+  //    printf("%s",gps_line);
 }
 
 bool gps_parse_data(void)
@@ -71,12 +68,13 @@ bool gps_parse_data(void)
     }
     else
     {
+        setLCD_LEFT('0');
+        setLCD_Right('0');
         latitude = 0.0;
         longitude = 0.0;
         setLED(2,0);
+        return false;
     }
-
-    return false;
 }
 
 float getLatitude(void)
