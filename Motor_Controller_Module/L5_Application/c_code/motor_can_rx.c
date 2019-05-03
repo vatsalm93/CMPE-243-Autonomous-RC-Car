@@ -43,7 +43,7 @@ bool send_rpm(void) {
     MOTOR_NODE_t rpm = { 0 };
     can_msg_t can_msg = { 0 };
 
-    rpm.MOTOR_SPEED_kph = get_speed();
+    rpm.MOTOR_SPEED_mps = get_speed();
 
     dbc_msg_hdr_t msg_hdr = dbc_encode_MOTOR_NODE(can_msg.data.bytes, &rpm);
     can_msg.msg_id = msg_hdr.mid;

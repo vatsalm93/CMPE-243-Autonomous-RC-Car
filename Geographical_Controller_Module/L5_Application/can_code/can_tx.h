@@ -20,5 +20,6 @@ bool transmit_compass_data_on_can(void);
 bool transmit_gps_data_on_can(void);
 bool transmit_heartbeat_on_can(void);
 bool transmit_debug_data_on_can(void);
+void can_receive(void);
 
 #endif /* CAN_TX_H_ */

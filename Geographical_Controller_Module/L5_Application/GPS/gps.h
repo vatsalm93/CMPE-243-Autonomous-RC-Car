@@ -25,6 +25,9 @@ float getLongitude(void);
 bool gps_parse_data(void);
 void create_gps_config(void);
 void gps_rx(void);
+float HeadingAngle(float lat, float lon);
+float calcDistance(float latDest, float lonDest);
+
 
 // different commands to set the update rate from once a second (1 Hz) to 10 times a second (10Hz)
 // Note that these only control the rate at which the position is echoed, to actually speed up the
