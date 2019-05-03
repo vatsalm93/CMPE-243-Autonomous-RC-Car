@@ -7,9 +7,10 @@
 
 #include "motor_control.h"
 #include "printf_lib.h"
+#include "rpm/c_pid.h"
 
 #define STEP_UPHILL 0.002
-//#define STEP_DOWNHILL 0.0004
+#define STEP_DOWNHILL 0.0004
 #define SPEED_LIMIT 16.05
 #define STOP 15.00
 #define REVERSE 14.2
@@ -21,10 +22,12 @@
 #define HARD_RIGHT 19.00
 #define HARD_LEFT 11.00
 
-CAR_CONTROL_t drive = {MOTOR_STOP, MOTOR_DONT_STEER, 0.00, {0}};
+CAR_CONTROL_t drive = {MOTOR_DONT_STEER, 2, 0.00, {0}};
 
-static float fw_pwm_val_motor = 15.70;
-static bool fw_flag = false;
+//extern s_pid_t dc;
+
+float fw_pwm_val_motor = 15.00;
+//static bool fw_flag = false;
 
 static uint32_t reverse_count = 0;
 static bool reverse_flag = false;
@@ -78,31 +81,23 @@ void command_servo(CAR_CONTROL_t *drive_servo){
     }
 }
 
-void forward_speed_control(CAR_CONTROL_t *drive_forward)
-{
+void forward_speed_control(CAR_CONTROL_t *drive_forward) {
     float speed = get_speed();
-    if (speed > (drive_forward->MOTOR_mps + 0.6)) {
-        setLED(3, 1);
-        fw_flag = true;
-        fw_pwm_val_motor = STOP;
-    }
-    else {
+    float _error = speed - drive_forward->MOTOR_kph;
 
-        if (fw_pwm_val_motor > SPEED_LIMIT)
-            fw_pwm_val_motor = SPEED_LIMIT;
+    if(_error > 0)
+        fw_pwm_val_motor -= _error/100;
+    else if(_error < 0)
+        fw_pwm_val_motor -= _error/200;
+    else{}
 
-        if (fw_flag == true) {
-            fw_pwm_val_motor = FORWARD_START;
-            fw_flag = false;
-        }
-        if((int)speed == 0) {
-            fw_pwm_val_motor += STEP_UPHILL + STEP_UPHILL + STEP_UPHILL;
-        }
-        else if ((speed > 0) && (speed < (drive_forward->MOTOR_mps)) &&
-                (fw_pwm_val_motor < SPEED_LIMIT)) {
-            fw_pwm_val_motor += STEP_UPHILL;
-        }
-    }
+    if(fw_pwm_val_motor < 15.00)
+        fw_pwm_val_motor = 15.00;
+    else if(fw_pwm_val_motor > 16.3)
+        fw_pwm_val_motor = 16.3;
+    if(_error > 2)
+        fw_pwm_val_motor = 15.00;
+
     set_pwm_value(motor_1, fw_pwm_val_motor);
 }
 

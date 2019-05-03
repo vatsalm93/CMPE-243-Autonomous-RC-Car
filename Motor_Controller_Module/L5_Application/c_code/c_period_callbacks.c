@@ -18,6 +18,9 @@
 #include "lcd.h"
 #include "lpc_timers.h"
 #include "printf_lib.h"
+#include "rpm/c_pid.h"
+
+s_pid_t dc = {0};
 
 bool C_period_init(void) {
     setLED(1, 0);
@@ -27,6 +30,7 @@ bool C_period_init(void) {
     set_pwm_value(servo_2, 15);
     setPin();
     setInput();
+    createPID(&dc);
 
 //    lpc_timer_enable(lpc_timer3, 1000);
     eint3_enable_port2(6, eint_falling_edge, eint3_handler);
@@ -40,7 +44,7 @@ bool C_period_reg_tlm(void) {
 
 void C_period_1Hz(uint32_t count) {
     (void) count;
-    calculate_speed();
+//    calculate_speed();
     motor_can_reset_busoff();
     motor_can_tx_heartbeat();
     send_rpm();
@@ -50,6 +54,8 @@ void C_period_1Hz(uint32_t count) {
 
 void C_period_10Hz(uint32_t count) {
     (void) count;
+    if(count % 5 == 0)
+        calculate_speed();
     command_motor(&drive);
 }
 
