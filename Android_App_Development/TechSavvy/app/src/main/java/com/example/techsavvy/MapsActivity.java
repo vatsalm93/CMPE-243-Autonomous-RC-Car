@@ -100,6 +100,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void startButton2OnClick(View view) {
         Toast.makeText(this, "Button pressed", Toast.LENGTH_LONG).show();
+
+        //Intent intent = new Intent(getApplicationContext(), Bluetooth.class);
+
+        //Send location to Maps
+        /*intent.putExtra("latitude_destination", dstLat);
+        intent.putExtra("longitude_destination", dstLng);*/
+
+        Bluetooth.dstLat = dstLat;
+        Bluetooth.dstLng = dstLng;
     }
 }
 
