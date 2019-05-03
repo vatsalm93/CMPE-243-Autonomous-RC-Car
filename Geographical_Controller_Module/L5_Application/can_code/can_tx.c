@@ -20,6 +20,9 @@ can_msg_t msg;
 #define RX_SIZE_DATA    100
 
 GPS_DEBUG_t debug_cmd = {0};
+static float checkpoint_lat = 0.0;
+static float checkpoint_long = 0.0;
+BRIDGE_CHECKPOINTS_t startLoc = {0};
 
 bool can_init(void)
 {
@@ -68,13 +71,20 @@ bool transmit_compass_data_on_can(void)
     can_msg_t can_msg = { 0 };
 
     float compass_Bearing_value = Compass_Get_Bearing_Angle();
-//    printf("Compass heading = %f\n", compass_heading_value);
+    float Heading_value = HeadingAngle(checkpoint_lat, checkpoint_long);
+
+
     if(compass_Bearing_value == 0.0)
         debug_cmd.IO_DEBUG_Compass_Rx = 1;
     else
         debug_cmd.IO_DEBUG_Compass_Rx = 0;
 
     compass_msg.CMP_BEARING_deg = compass_Bearing_value;
+    compass_msg.CMP_HEADING_deg = Heading_value;
+
+    float distance = calcDistance(checkpoint_lat, checkpoint_long);
+    //    printf("Distance to checkpoint = %f\n", distance_to_checkpoint);
+    compass_msg.CMP_DISTANCE_meters = distance;
 
     dbc_msg_hdr_t msg_hdr = dbc_encode_COMPASS(can_msg.data.bytes, &compass_msg);
     can_msg.msg_id = msg_hdr.mid;
@@ -114,6 +124,26 @@ bool transmit_heartbeat_on_can(void)
     return ((bool)debug_cmd.IO_DEBUG_HBT_Transmit);
 }
 
+void can_receive(void)
+{
+    can_msg_t can_msg;
+
+    while(CAN_rx(can1, &can_msg, 0))
+    {
+        dbc_msg_hdr_t msg_hdr_receive;
+        msg_hdr_receive.mid = can_msg.msg_id;
+        msg_hdr_receive.dlc = can_msg.frame_fields.data_len;
+
+        switch(can_msg.msg_id)
+        {
+            case 107:
+                dbc_decode_BRIDGE_CHECKPOINTS(&startLoc, can_msg.data.bytes, &msg_hdr_receive);
+                checkpoint_lat = startLoc.CHECKPOINT_LAT_deg;
+                checkpoint_long = startLoc.CHECKPOINT_LONG_deg;
+                break;
+        }
+    }
+}
 
 void check_bus_off(void){
     if(CAN_is_bus_off(can1)){
