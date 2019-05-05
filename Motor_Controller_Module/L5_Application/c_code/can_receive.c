@@ -22,7 +22,7 @@ const COMPASS_t                            COMPASS__MIA_MSG = {0};
 const uint32_t                             MASTER_HEARTBEAT__MIA_MS = 3000;
 const MASTER_HEARTBEAT_t                   MASTER_HEARTBEAT__MIA_MSG = {0};
 const uint32_t                             CAR_CONTROL__MIA_MS = 3000;
-const CAR_CONTROL_t                        CAR_CONTROL__MIA_MSG = { MOTOR_STOP, MOTOR_DONT_STEER, 0, { 0 } };
+const CAR_CONTROL_t                        CAR_CONTROL__MIA_MSG = { MOTOR_STOP, 30, 0, { 0 } };
 
 bool receive_can_msg(void){
     can_msg_t can_motor_msg;

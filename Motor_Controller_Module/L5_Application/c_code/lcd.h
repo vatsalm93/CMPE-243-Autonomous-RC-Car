@@ -53,6 +53,7 @@ typedef struct
     char data_msb;
     char data_lsb;
     char checksum;
+    char ack;
 } lcd_data_packet_t;
 
 

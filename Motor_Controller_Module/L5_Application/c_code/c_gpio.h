@@ -15,11 +15,7 @@
 extern "C" {
 #endif
 
-void setPin(void);
-void setInput(void);
-void setOutput(void);
-void SET(bool check);
-bool read_pin(void);
+void GPIO_interrupt(void);
 
 #ifdef __cplusplus
 }
