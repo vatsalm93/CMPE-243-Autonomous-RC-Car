@@ -80,8 +80,10 @@ void period_1Hz(uint32_t count)
 
 void period_10Hz(uint32_t count)
 {
-    check_for_data_on_gps();
-
+   // check_for_data_on_gps();
+    gps_rx();
+    can_receive();
+    gps_parse_data();
     // Send out Driver command at 10Hz
     transmit_compass_data_on_can();
 }

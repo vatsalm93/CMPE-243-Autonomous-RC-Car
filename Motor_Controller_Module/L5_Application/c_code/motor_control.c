@@ -7,24 +7,26 @@
 
 #include "motor_control.h"
 #include "printf_lib.h"
+#include "rpm/c_pid.h"
+#include "servo_degree.h"
 
-#define STEP_UPHILL 0.0002
+#define STEP_UPHILL 0.002
 #define STEP_DOWNHILL 0.0004
-#define SPEED_LIMIT 16.10
+#define SPEED_LIMIT 16.05
 #define STOP 15.00
 #define REVERSE 14.2
 #define FORWARD_START 15.7
 
-#define NO_STEER 15.00
+#define NO_STEER 90.00
 #define SLIGHT_RIGHT 17.00
 #define SLIGHT_LEFT 13.00
 #define HARD_RIGHT 19.00
 #define HARD_LEFT 11.00
 
-CAR_CONTROL_t drive = {2, 2, 0.00, {0}};
+CAR_CONTROL_t drive = {MOTOR_STOP, 0, 0.00, {0}};
 
-static float fw_pwm_val_motor = 15.7;
-static bool fw_flag = false;
+float fw_pwm_val_motor = 15.00;
+//static bool fw_flag = false;
 
 static uint32_t reverse_count = 0;
 static bool reverse_flag = false;
@@ -59,53 +61,49 @@ void command_motor(CAR_CONTROL_t *drive_motor) {
 }
 
 void command_servo(CAR_CONTROL_t *drive_servo){
-    switch (drive_servo->MOTOR_STEER_cmd) {
-        case MOTOR_DONT_STEER:
-            set_pwm_value(servo_2, NO_STEER);
-            break;
-        case MOTOR_STEER_FULL_LEFT:
-            set_pwm_value(servo_2, HARD_LEFT);
-            setLED(2,1);
-            break;
-        case MOTOR_STEER_SLIGHT_LEFT:
-            set_pwm_value(servo_2, SLIGHT_LEFT);
-            break;
-        case MOTOR_STEER_SLIGHT_RIGHT:
-            set_pwm_value(servo_2, SLIGHT_RIGHT);
-            setLED(3,1);
-            break;
-        case MOTOR_STEER_FULL_RIGHT:
-            set_pwm_value(servo_2, HARD_RIGHT);
-            break;
-    }
+//    drive.MOTOR_STEER_cmd = 180;
+    float percent = get_servo_angle();
+    set_pwm_value(servo_2, percent);
+//    switch (drive_servo->MOTOR_STEER_cmd) {
+//        case MOTOR_DONT_STEER:
+//            set_pwm_value(servo_2, NO_STEER);
+//            break;
+//        case MOTOR_STEER_FULL_LEFT:
+//            set_pwm_value(servo_2, HARD_LEFT);
+//            break;
+//        case MOTOR_STEER_SLIGHT_LEFT:
+//            set_pwm_value(servo_2, SLIGHT_LEFT);
+//            break;
+//        case MOTOR_STEER_SLIGHT_RIGHT:
+//            set_pwm_value(servo_2, SLIGHT_RIGHT);
+//            break;
+//        case MOTOR_STEER_FULL_RIGHT:
+//            set_pwm_value(servo_2, HARD_RIGHT);
+//            break;
+//    }
+
+
+
 }
 
-void forward_speed_control(CAR_CONTROL_t *drive_forward)
-{
+void forward_speed_control(CAR_CONTROL_t *drive_forward) {
     float speed = get_speed();
-    if (speed >= (drive_forward->MOTOR_kph + 1)) {
-        setLED(3, 1);
-        fw_flag = true;
-        set_pwm_value(motor_1, STOP);
-        fw_pwm_val_motor = STOP;
-    }
+    float _error = speed - drive_forward->MOTOR_kph;
 
-    else {
-        if (fw_pwm_val_motor > SPEED_LIMIT)
-            fw_pwm_val_motor = SPEED_LIMIT;
+    if(_error > 0)
+        fw_pwm_val_motor -= _error/150;
+    else if(_error < 0)
+        fw_pwm_val_motor -= _error/220;
+    else{}
 
-        if (speed < (drive_forward->MOTOR_kph) && fw_pwm_val_motor < SPEED_LIMIT) {
-            if (fw_flag == true) {
-                fw_pwm_val_motor = FORWARD_START;
-                fw_flag = false;
-            }
-            fw_pwm_val_motor += STEP_UPHILL;
-        }
-        if((int)speed == 0) {
-            fw_pwm_val_motor += STEP_UPHILL + STEP_UPHILL;
-        }
-        set_pwm_value(motor_1, fw_pwm_val_motor);
-    }
+    if(fw_pwm_val_motor < 15.00)
+        fw_pwm_val_motor = 15.00;
+    else if(fw_pwm_val_motor > 16.3)
+        fw_pwm_val_motor = 16.3;
+//    if(_error > 2)
+//        fw_pwm_val_motor = 15.00;
+
+    set_pwm_value(motor_1, fw_pwm_val_motor);
 }
 
 void command_motor_reverse(void)

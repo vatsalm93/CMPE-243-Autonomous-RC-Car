@@ -56,6 +56,7 @@ void lcd_put_comm(char event_id, char obj_id, char obj_num, char data_msb, char 
     uart3_put_char(data_msb, 0);
     uart3_put_char(data_lsb, 0);
     uart3_put_char(checksum, 0);
+   // uart3_get_char(&lcd_screen_id.ack, 0);
 }
 
 void lcd_put_string(char obj_num, char *data, int data_size)
@@ -71,7 +72,8 @@ void lcd_put_string(char obj_num, char *data, int data_size)
         checksum ^= data[i];
     }
     uart3_put_char(checksum, 0);
-}
+   // uart3_get_char(&lcd_screen_id.ack, 0);
+  }
 
 void lcd_receive(void)
 {
@@ -91,27 +93,35 @@ void lcd_receive(void)
 
 void lcd_get_screen_id(char screen_id)
 {
+    u0_dbg_printf("ScreenId: %d\n",screen_id);
     switch(screen_id)
     {
         case 0:
+            lcd_print_menu_screen();
             lcd_screen = menu;
             break;
         case 1:
+            lcd_print_bridge_screen();
             lcd_screen = bridge;
             break;
         case 2:
+            lcd_print_gps_screen();
             lcd_screen = gps;
             break;
         case 3:
+            lcd_print_sensor_screen();
             lcd_screen = sensor;
             break;
         case 4:
+            lcd_print_motor_screen();
             lcd_screen = motor;
             break;
         case 5:
+            lcd_print_home_screen();
             lcd_screen = home;
             break;
         case 6:
+            lcd_print_mia_screen();
             lcd_screen = mia;
             break;
         default:
@@ -121,7 +131,6 @@ void lcd_get_screen_id(char screen_id)
 
 void lcd_print()
 {
-
     switch (lcd_screen)
     {
         case menu:

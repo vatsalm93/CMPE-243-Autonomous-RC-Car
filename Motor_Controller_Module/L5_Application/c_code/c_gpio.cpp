@@ -2,7 +2,7 @@
  * c_gpio.cpp
  *
  *  Created on: Apr 9, 2019
- *      Author: halak
+ *      Author: Jay
  */
 
 #include "c_gpio.h"
@@ -10,26 +10,7 @@
 
 GPIO *gpio;
 
-void setPin(void)
-{
+void GPIO_interrupt(void) {
      gpio = new GPIO(P2_6);
-}
-
-void setInput()
-{
-    gpio->setAsInput();
-}
-
-void setOutput()
-{
-    gpio->setAsOutput();
-}
-
-void SET(bool check)
-{
-    gpio->set(check);
-}
-
-bool read_pin(void){
-    return gpio->read();
+     gpio->setAsInput();
 }

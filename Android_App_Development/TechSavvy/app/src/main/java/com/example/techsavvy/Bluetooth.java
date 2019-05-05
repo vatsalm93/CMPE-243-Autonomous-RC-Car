@@ -59,6 +59,8 @@ public class Bluetooth extends AppCompatActivity {
     private CheckBox mStop;
     private static float mlat_rx;
     private static float mlong_rx;
+    static double dstLat = 0.00;
+    static double dstLng = 0.00;
     private static float mcompass_rx;
 
 
@@ -117,7 +119,7 @@ public class Bluetooth extends AppCompatActivity {
                     String readMessage = new String();
                     try {
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
-                        Log.d("HANDLER", readMessage);
+                        //Log.d("HANDLER", readMessage);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -150,12 +152,12 @@ public class Bluetooth extends AppCompatActivity {
 
                     {
                         if(mConnectedThread != null) //First check to make sure thread created
-                            mConnectedThread.write("1");
+                            mConnectedThread.write("S1");
                     }
                     else
                     {
                         if(mConnectedThread != null) //First check to make sure thread created
-                            mConnectedThread.write("0");
+                            mConnectedThread.write("S0");
                     }
                 }
             });
@@ -371,8 +373,10 @@ public class Bluetooth extends AppCompatActivity {
         public void run() {
             byte[] buffer = new byte[8192];  // buffer store for the stream
             int bytes; // bytes returned from read()
+
             // Keep listening to the InputStream until an exception occurs
             while (true) {
+
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.available();
@@ -384,7 +388,28 @@ public class Bluetooth extends AppCompatActivity {
                         mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                                 .sendToTarget(); // Send the obtained bytes to the UI activity
                     }
-                } catch (IOException e) {
+                    /*Intent intent = getIntent();
+                    //Get Longitude and Latitude Values
+                    dstLat = intent.getDoubleExtra("latitude", 15.00);
+                    dstLng = intent.getDoubleExtra("longitude", 25.00);*/
+
+                    if(dstLat>25 && dstLng < 0)
+                    {
+                        //Convert destination values to string
+                        String latitudeStr = "Lat:" + String.valueOf(dstLat);
+                        String longitudeStr = "Long:" + String.valueOf(dstLng);
+                        write(latitudeStr);
+                        SystemClock.sleep(100);
+                        write(longitudeStr);
+                        SystemClock.sleep(100);
+                        write("0");
+                        //Log.d("Lat for Dst", latitudeStr);
+                        //Log.d("Long for Dst", longitudeStr);
+                        dstLat = dstLng = 0.00;
+                        //Toast.makeText(this, "Button pressed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                catch (IOException e) {
                     e.printStackTrace();
 
                     break;
@@ -397,6 +422,7 @@ public class Bluetooth extends AppCompatActivity {
             byte[] bytes = input.getBytes();           //converts entered String into bytes
             try {
                 mmOutStream.write(bytes);
+                Log.d("Writing", input);
             } catch (IOException e) { }
         }
 
