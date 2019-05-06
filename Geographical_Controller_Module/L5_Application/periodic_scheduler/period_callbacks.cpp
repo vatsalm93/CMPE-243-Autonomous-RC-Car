@@ -50,13 +50,12 @@ const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 
 
 GPIO gpio1_0(P1_29);
-
 /// Called once before the RTOS is started, this is a good place to initialize things once
 bool period_init(void)
 {
     gpio1_0.setAsInput();
-    can_init();
     init_gps();
+    can_init();
     return true;
 }
 
@@ -73,14 +72,13 @@ bool period_reg_tlm(void)
 void period_1Hz(uint32_t count)
 {
     check_bus_off();
+    get_compass_data();
     transmit_heartbeat_on_can();
     transmit_debug_data_on_can();
-    get_compass_data();
 }
 
 void period_10Hz(uint32_t count)
 {
-   // check_for_data_on_gps();
     gps_rx();
     can_receive();
     gps_parse_data();

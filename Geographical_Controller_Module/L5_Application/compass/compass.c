@@ -19,19 +19,18 @@ float Compass_Get_Bearing_Angle(void)
 
     if (I2C_ReadRegisters(COMPASS_I2C_ADDR, COMPASS_BEARING_16BIT_REG_ADDR, &buffer[0], READ_TWO_REGISTERS))
     {
-        setLED(3,1);
+       // setLED(3,1);
         bearing_int = buffer[0];
         bearing_int <<= 8;
         bearing_int += buffer[1];
         bearing_float = (float)(bearing_int/10.00);
-        //printf("%f\n",bearing_float);
        // bearing_float = bearing_float + COMPASS_OFFSET;
+       // printf("%f\n",bearing_float);
         return bearing_float;
     }
     return 0;
 }
 
-//
 void Start_Compass_Calibration(void)
 {
     uint8_t buffer[3] = { 0xF0,0xF5,0xF6 };

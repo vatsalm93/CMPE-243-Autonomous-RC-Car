@@ -41,7 +41,7 @@ void gps_rx(void)
 {
     if(cgets(gps_line, 120, 50))
     {
-        setLED(3,1);
+        setLED(2,1);
     }
   //    printf("%s",gps_line);
 }
@@ -68,7 +68,6 @@ bool gps_parse_data(void)
         longitude += (int)(tempLon/100);
         longitude = -longitude;
 
-        setLED(2,1);
         return true;
     }
     else
@@ -77,22 +76,21 @@ bool gps_parse_data(void)
         setLCD_Right('0');
         latitude = 0.0;
         longitude = 0.0;
-        setLED(2,0);
         return false;
     }
 }
 
 //Function which returns the bearing angle
-float HeadingAngle(float lat, float lon)
+float HeadingAngle(float latDest, float lonDest)
 {
-    if (lat == 0.0 && lon == 0.0)
+    if (latDest == 0.0 && lonDest == 0.0)
     {
         return 0;
     }
-    float dLon = lon - longitude;
-    float x = cos(lat * PI/180.0) * sin(dLon * PI/180.0);
-    float y = cos(latitude * PI/180.0) * sin(lat * PI/180.0)
-              - sin(latitude * PI/180.0) * cos(lat * PI/180.0) * cos(dLon * PI/180.0);
+    float dLon = lonDest - longitude;
+    float x = cos(latDest * PI/180.0) * sin(dLon * PI/180.0);
+    float y = cos(latitude * PI/180.0) * sin(latDest * PI/180.0)
+              - sin(latitude * PI/180.0) * cos(latDest * PI/180.0) * cos(dLon * PI/180.0);
 
     float Heading = (atan2(x,y) * 180.0/PI);
 
@@ -106,20 +104,6 @@ float HeadingAngle(float lat, float lon)
 
 float calcDistance(float latDest, float lonDest)
 {
- /*   double latHomeTmp = (PI/180)*(latHome);
-    double latDestTmp = (PI/180)*(latDest);
-    double differenceLon = (PI/180)*(lonDest - lonHome);
-    double differenceLat = (PI/180)*(latDest - latHome);
-
-    double a = sin(differenceLat/2.0) * sin(differenceLat/2.0) +
-           cos(latHomeTmp) * cos(latDestTmp) *
-           sin(differenceLon/2.0) * sin(differenceLon/2.0);
-    double c = 2.0 * atan2(sqrt(a), sqrt(1-a));
-    double distance = R * c;
-
-    printf("%f\n", distance);
-    return distance;*/
-
     float deltaLat = latDest - latitude;
     float deltaLon = lonDest - longitude;
 

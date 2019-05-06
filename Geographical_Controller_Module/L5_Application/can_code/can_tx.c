@@ -6,7 +6,8 @@
  */
 
 #include "can.h"
-#include "stdio.h"
+#include <stdio.h>
+#include <stdbool.h>
 #include "generated_can.h"
 #include "can_tx.h"
 #include "gps.h"
@@ -20,9 +21,11 @@ can_msg_t msg;
 #define RX_SIZE_DATA    100
 
 GPS_DEBUG_t debug_cmd = {0};
+static bool setHeartbeat = false;
 static float checkpoint_lat = 0.0;
 static float checkpoint_long = 0.0;
 BRIDGE_CHECKPOINTS_t startLoc = {0};
+MASTER_HEARTBEAT_t heartbeat = {0};
 
 bool can_init(void)
 {
@@ -40,39 +43,43 @@ bool can_init(void)
     return val;
 }
 
-bool transmit_gps_data_on_can(void){
-    GPS_LOCATION_t gps_cmd = {0};
-    gps_cmd.CURRENT_LAT_deg = getLatitude();
-    gps_cmd.CURRENT_LONG_deg = getLongitude();
+bool transmit_gps_data_on_can(void)
+{
+   // if(setHeartbeat)
+    {
+        GPS_LOCATION_t gps_cmd = {0};
+        gps_cmd.CURRENT_LAT_deg = getLatitude();
+        gps_cmd.CURRENT_LONG_deg = getLongitude();
 
-    if(gps_cmd.CURRENT_LAT_deg == 0.0) {
-        debug_cmd.IO_DEBUG_GPS_Fix = 1;
-        debug_cmd.IO_DEBUG_GPS_rx = 1;
+        if(gps_cmd.CURRENT_LAT_deg == 0.0) {
+            debug_cmd.IO_DEBUG_GPS_Fix = 1;
+            debug_cmd.IO_DEBUG_GPS_rx = 1;
+        }
+        else {
+            debug_cmd.IO_DEBUG_GPS_Fix = 0;
+            debug_cmd.IO_DEBUG_GPS_rx = 0;
+        }
+
+        can_msg_t can_msg = { 0 };
+
+        // Encode the CAN message's data bytes, get its header and set the CAN message's DLC and length
+        dbc_msg_hdr_t msg_hdr = dbc_encode_GPS_LOCATION(can_msg.data.bytes, &gps_cmd);
+        can_msg.msg_id = msg_hdr.mid;
+        can_msg.frame_fields.data_len = msg_hdr.dlc;
+
+        // Queue the CAN message to be sent out
+        return (CAN_tx(can1, &can_msg, 0));
     }
-    else {
-        debug_cmd.IO_DEBUG_GPS_Fix = 0;
-        debug_cmd.IO_DEBUG_GPS_rx = 0;
-    }
-
-    can_msg_t can_msg = { 0 };
-
-    // Encode the CAN message's data bytes, get its header and set the CAN message's DLC and length
-    dbc_msg_hdr_t msg_hdr = dbc_encode_GPS_LOCATION(can_msg.data.bytes, &gps_cmd);
-    can_msg.msg_id = msg_hdr.mid;
-    can_msg.frame_fields.data_len = msg_hdr.dlc;
-
-    // Queue the CAN message to be sent out
-    return (CAN_tx(can1, &can_msg, 0));
 }
 
 bool transmit_compass_data_on_can(void)
 {
+  // if(setHeartbeat)
     COMPASS_t compass_msg = {0};
     can_msg_t can_msg = { 0 };
 
     float compass_Bearing_value = Compass_Get_Bearing_Angle();
     float Heading_value = HeadingAngle(checkpoint_lat, checkpoint_long);
-
 
     if(compass_Bearing_value == 0.0)
         debug_cmd.IO_DEBUG_Compass_Rx = 1;
@@ -81,6 +88,16 @@ bool transmit_compass_data_on_can(void)
 
     compass_msg.CMP_BEARING_deg = compass_Bearing_value;
     compass_msg.CMP_HEADING_deg = Heading_value;
+
+ /*   float deflection_angle = Heading_value - compass_Bearing_value;
+    if (deflection_angle > 180)
+    {
+        deflection_angle -= 360;
+    }
+    else if (deflection_angle < -180)
+    {
+        deflection_angle += 360;
+    }*/
 
     float distance = calcDistance(checkpoint_lat, checkpoint_long);
     //    printf("Distance to checkpoint = %f\n", distance_to_checkpoint);
@@ -117,7 +134,7 @@ bool transmit_heartbeat_on_can(void)
     can_msg.msg_id = msg_hdr.mid;
     can_msg.frame_fields.data_len = msg_hdr.dlc;
 
-    setLED(4,1);
+   // setLED(4,1);
 
     debug_cmd.IO_DEBUG_HBT_Transmit = (char)CAN_tx(can1, &can_msg, 0);
     // Queue the CAN message to be sent out
@@ -136,6 +153,20 @@ void can_receive(void)
 
         switch(can_msg.msg_id)
         {
+            case 110:
+               dbc_decode_MASTER_HEARTBEAT(&heartbeat, can_msg.data.bytes, &msg_hdr_receive);
+                   if(heartbeat.MASTER_hbt == 1)
+                   {
+                       setHeartbeat = true;
+                       setLED(4,1);
+                   }
+                   else if(heartbeat.MASTER_hbt == 1)
+                   {
+                       setHeartbeat = false;
+                       setLED(4,0);
+                   }
+               break;
+
             case 107:
                 dbc_decode_BRIDGE_CHECKPOINTS(&startLoc, can_msg.data.bytes, &msg_hdr_receive);
                 checkpoint_lat = startLoc.CHECKPOINT_LAT_deg;
