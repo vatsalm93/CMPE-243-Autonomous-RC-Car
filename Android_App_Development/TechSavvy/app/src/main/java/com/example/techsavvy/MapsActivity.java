@@ -170,6 +170,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         boolean on = ((ToggleButton) view).isChecked();
         if (on) {
             Bluetooth.cmdStartStop = "S1";
+            Toast.makeText(this, "Button pressed", Toast.LENGTH_LONG).show();
+
+            //Intent intent = new Intent(getApplicationContext(), Bluetooth.class);
+
+            //Send location to Maps
+        /*intent.putExtra("latitude_destination", dstLat);
+        intent.putExtra("longitude_destination", dstLng);*/
+
+            Bluetooth.dstLat = dstLat;
+            Bluetooth.dstLng = dstLng;
+            Bluetooth.flagStartButtonPressed = true;
         } else {
             Bluetooth.cmdStartStop = "S0";
         }
