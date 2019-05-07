@@ -108,13 +108,11 @@ float calcDistance(float latDest, float lonDest)
     float deltaLon = lonDest - longitude;
 
     float A = pow(sin((deltaLat/2.0) * (PI/180.0)), 2.0)
-              + (cos(latDest * PI/180.0) * cos(latitude * PI/180.0) * pow(sin(deltaLon/2 * (PI/180.0)), 2.0));
-    float C = 2 * atan2(sqrt(A), sqrt(1-A));
+              + (cos(latDest * PI/180.0) * cos(latitude * PI/180.0) * pow(sin(deltaLon/2.0 * (PI/180.0)), 2.0));
+    float C = 2.0 * atan2(sqrt(A), sqrt(1-A));
 
     return R * C * 1000; //1000 for meters
 }
-
-
 
 float getLatitude(void)
 {
