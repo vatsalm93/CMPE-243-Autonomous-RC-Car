@@ -62,6 +62,8 @@ public class Bluetooth extends AppCompatActivity {
     static double dstLat = 0.00;
     static double dstLng = 0.00;
     private static float mcompass_rx;
+    static String cmdStartStop = "S0";
+    static boolean flagStartButtonPressed;
 
 
     private final String TAG = MainActivity.class.getSimpleName();
@@ -119,7 +121,7 @@ public class Bluetooth extends AppCompatActivity {
                     String readMessage = new String();
                     try {
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
-                        //Log.d("HANDLER", readMessage);
+                        Log.d("HANDLER", readMessage);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -193,14 +195,17 @@ public class Bluetooth extends AppCompatActivity {
                 {
                     String item = token.split(":")[0];
                     String value = token.split(":")[1];
-                    if(item.equalsIgnoreCase("Lat")) {
-                        mlat_rx = Float.parseFloat(value);
-                        mlatitude.setText(value);
-                    }
-                    else if(item.equalsIgnoreCase("Long")) {
-                        mlong_rx = Float.parseFloat(value);
-                        mlongitude.setText(value);
-                    }
+                        if (item.equalsIgnoreCase("Lat")) {
+                            if (value != null && (!value.isEmpty())&& isNumeric(value)) {
+                                mlat_rx = Float.parseFloat(value);
+                            }
+                            mlatitude.setText(value);
+                        } else if (item.equalsIgnoreCase("Long")) {
+                            if (value != null && (!value.isEmpty())&& isNumeric(value)) {
+                                mlong_rx = Float.parseFloat(value);
+                            }
+                            mlongitude.setText(value);
+                        }
                     else if(item.equalsIgnoreCase("Bearing"))
                     {
                         //mcompass_rx = Float.parseFloat(value);
@@ -240,6 +245,15 @@ public class Bluetooth extends AppCompatActivity {
             }//end while
         } // end try
         catch(ArrayIndexOutOfBoundsException exc){
+        }
+    }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch(NumberFormatException e){
+            return false;
         }
     }
 
@@ -393,7 +407,7 @@ public class Bluetooth extends AppCompatActivity {
                     dstLat = intent.getDoubleExtra("latitude", 15.00);
                     dstLng = intent.getDoubleExtra("longitude", 25.00);*/
 
-                    if(dstLat>25 && dstLng < 0)
+                    if(dstLat>25 && dstLng < 0 && flagStartButtonPressed)
                     {
                         //Convert destination values to string
                         String latitudeStr = "Lat:" + String.valueOf(dstLat);
@@ -403,15 +417,17 @@ public class Bluetooth extends AppCompatActivity {
                         write(longitudeStr);
                         SystemClock.sleep(100);
                         write("0");
-                        //Log.d("Lat for Dst", latitudeStr);
-                        //Log.d("Long for Dst", longitudeStr);
+                        Log.d("Lat for Dst", latitudeStr);
+                        Log.d("Long for Dst", longitudeStr);
                         dstLat = dstLng = 0.00;
                         //Toast.makeText(this, "Button pressed", Toast.LENGTH_SHORT).show();
+                        flagStartButtonPressed = false;
+                        write(cmdStartStop);
                     }
+
                 }
                 catch (IOException e) {
                     e.printStackTrace();
-
                     break;
                 }
             }

@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,13 +21,17 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private GoogleMap mMap;
-    private ActionBar actionbar;//=getSupportActionBar();
+    private ActionBar actionbar;
+    ToggleButton toggleStart;
+
 
     double srcLat, srcLng, dstLat, dstLng;
 
@@ -35,7 +40,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-
         toolbar=(Toolbar) findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
 
@@ -43,6 +47,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
+
+        toggleStart = (ToggleButton) findViewById(R.id.mapButton);
 
         navigationView = (NavigationView)findViewById(R.id.NavigationView);
         //Log.i(TAG, "Inside onCreate");
@@ -124,8 +130,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //Round value to 2-decimal to test accuracy of GPS location
         //https://stackoverflow.com/questions/5945867/how-to-round-the-double-value-to-2-decimal-points
-        double lat2Dec = (Math.round(dstLat * 100.0))/100.0;
-        double long2Dec = (Math.round(dstLng * 100.0))/100.0;
+        double lat2Dec = (Math.round(dstLat * 1000000.0))/1000000.0;
+        double long2Dec = (Math.round(dstLng * 1000000.0))/1000000.0;
 
         //Convert to string for logging the values
         String latitudeStr = String.valueOf(dstLat);
@@ -156,6 +162,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Bluetooth.dstLat = dstLat;
         Bluetooth.dstLng = dstLng;
+        Bluetooth.flagStartButtonPressed = true;
+    }
+
+    public void onToggleClicked(View view) {
+        // Is the toggle on?
+        boolean on = ((ToggleButton) view).isChecked();
+        if (on) {
+            Bluetooth.cmdStartStop = "S1";
+        } else {
+            Bluetooth.cmdStartStop = "S0";
+        }
     }
 }
 
