@@ -15,12 +15,47 @@
 #define DEGREES220  (220.0)
 #define DEGREES300  (300.0)
 #define DEGREES280 280.0
-#define DEGREES350 (350.0)
+#define DEGREES340 (340.0)
 #define DEGREES360 (360.0)
-<<<<<<< HEAD:Sensor_Controller_Module/lpc1758_freertos_lidar_v4/L5_Application/Lidar_includes/rplidar_cmd.h
 
-=======
->>>>>>> e235689cde238682addcfa48d29aea97560ad857:Sensor_Controller_Module/lpc1758_freertos_sensor_node/L5_Application/Lidar_includes/rplidar_cmd.h
+#define DEGREE_0        0.0
+#define DEGREE_10       10.0
+#define DEGREE_20       20.0
+#define DEGREE_30       30.0
+#define DEGREE_40       40.0
+#define DEGREE_50       50.0
+#define DEGREE_60       60.0
+#define DEGREE_70       70.0
+#define DEGREE_80       80.0
+#define DEGREE_90       90.0
+#define DEGREE_100      100.0
+#define DEGREE_110      110.0
+#define DEGREE_120      120.0
+#define DEGREE_130      130.0
+#define DEGREE_140      140.0
+#define DEGREE_150      150.0
+#define DEGREE_160      160.0
+#define DEGREE_170      170.0
+#define DEGREE_180      180.0
+#define DEGREE_190      190.0
+#define DEGREE_200      200.0
+#define DEGREE_210      210.0
+#define DEGREE_220      220.0
+#define DEGREE_230      230.0
+#define DEGREE_240      240.0
+#define DEGREE_250      250.0
+#define DEGREE_260      260.0
+#define DEGREE_270      270.0
+#define DEGREE_280      280.0
+#define DEGREE_290      290.0
+#define DEGREE_300      300.0
+#define DEGREE_310      310.0
+#define DEGREE_320      320.0
+#define DEGREE_330      330.0
+#define DEGREE_340      340.0
+#define DEGREE_350      350.0
+#define DEGREE_360      360.0
+
 
 // Commands without payload and response
 #define RPLIDAR_CMD_STOP               0x25
