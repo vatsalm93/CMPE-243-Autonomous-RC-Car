@@ -20,6 +20,8 @@
 #include "printf_lib.h"
 #include "rpm/c_pid.h"
 
+s_pid_t dc = {0};
+
 bool C_period_init(void) {
     setLED(1, 0);
     motor_can_init();
@@ -29,6 +31,7 @@ bool C_period_init(void) {
     GPIO_interrupt();
     eint3_enable_port2(6, eint_falling_edge, eint3_handler);
     lcd_init();
+    createPID(&dc);
     return true;
 }
 bool C_period_reg_tlm(void) {
@@ -46,7 +49,7 @@ void C_period_1Hz(uint32_t count) {
 void C_period_10Hz(uint32_t count) {
     (void) count;
 
-    if(count % 5 == 0)
+    if(count % 3 == 0)
         calculate_speed();
     command_motor(&drive);
 }
@@ -56,8 +59,6 @@ void C_period_100Hz(uint32_t count) {
     receive_can_msg();
     command_servo(&drive);
     lcd_receive();
-//    if(count%9==0)
-//    lcd_print();
 }
 
 void C_period_1000Hz(uint32_t count) {

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "c_uart3_wrapper.h"
 #include <string.h>
+#include "printf_lib.h"
 
 lcd_data_packet_t lcd_screen_id = {0};
 static lcd_screen_t lcd_screen = home;

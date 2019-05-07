@@ -5,10 +5,10 @@
 extern "C" {
 #endif
 
-#define KP      0.001
-#define KI      0.01
-#define KD      0.1
-#define DT      0.5
+#define KP      0.005
+#define KI      0.000025
+#define KD      0.0005
+#define DT      0.1
 #define MIN     -255
 #define MAX     255
 

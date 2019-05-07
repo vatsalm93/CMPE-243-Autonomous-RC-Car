@@ -17,14 +17,14 @@
 #define REVERSE 14.2
 #define FORWARD_START 15.7
 
-#define NO_STEER 90.00
+#define NO_STEER 0
 #define SLIGHT_RIGHT 17.00
 #define SLIGHT_LEFT 13.00
 #define HARD_RIGHT 19.00
 #define HARD_LEFT 11.00
 
-CAR_CONTROL_t drive = {MOTOR_STOP, 0, 0.00, {0}};
-
+CAR_CONTROL_t drive = {MOTOR_STOP, NO_STEER, 0.00, {0}};
+extern s_pid_t dc;
 float fw_pwm_val_motor = 15.00;
 //static bool fw_flag = false;
 
@@ -61,8 +61,8 @@ void command_motor(CAR_CONTROL_t *drive_motor) {
 }
 
 void command_servo(CAR_CONTROL_t *drive_servo){
-//    drive.MOTOR_STEER_cmd = 180;
-    float percent = get_servo_angle();
+    drive.MOTOR_STEER_cmd = 180;
+    float percent = get_servo_angle(drive_servo);
     set_pwm_value(servo_2, percent);
 //    switch (drive_servo->MOTOR_STEER_cmd) {
 //        case MOTOR_DONT_STEER:
@@ -81,29 +81,36 @@ void command_servo(CAR_CONTROL_t *drive_servo){
 //            set_pwm_value(servo_2, HARD_RIGHT);
 //            break;
 //    }
-
-
-
 }
 
 void forward_speed_control(CAR_CONTROL_t *drive_forward) {
+//    float speed = get_speed();
+//    float _error = speed - drive_forward->MOTOR_kph;
+//
+//    if(_error > 0)
+//        fw_pwm_val_motor -= _error/150;
+//    else if(_error < 0)
+//        fw_pwm_val_motor -= _error/220;
+//    else{}
+//
+//    if(fw_pwm_val_motor < 15.00)
+//        fw_pwm_val_motor = 15.00;
+//    else if(fw_pwm_val_motor > 16.3)
+//        fw_pwm_val_motor = 16.3;
+////    if(_error > 2)
+////        fw_pwm_val_motor = 15.00;
+//
+//    set_pwm_value(motor_1, fw_pwm_val_motor);
+
     float speed = get_speed();
-    float _error = speed - drive_forward->MOTOR_kph;
-
-    if(_error > 0)
-        fw_pwm_val_motor -= _error/150;
-    else if(_error < 0)
-        fw_pwm_val_motor -= _error/220;
-    else{}
-
+    float _error = calculate(drive_forward->MOTOR_kph, speed, &dc);
+    fw_pwm_val_motor += _error;
     if(fw_pwm_val_motor < 15.00)
         fw_pwm_val_motor = 15.00;
     else if(fw_pwm_val_motor > 16.3)
         fw_pwm_val_motor = 16.3;
-//    if(_error > 2)
-//        fw_pwm_val_motor = 15.00;
-
     set_pwm_value(motor_1, fw_pwm_val_motor);
+    u0_dbg_printf("PWM: %f\n", fw_pwm_val_motor);
 }
 
 void command_motor_reverse(void)

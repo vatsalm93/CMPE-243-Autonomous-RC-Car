@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-float get_servo_angle(void);
+float get_servo_angle(CAR_CONTROL_t * servo);
 
 #ifdef __cplusplus
 }

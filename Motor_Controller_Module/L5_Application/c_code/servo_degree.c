@@ -6,16 +6,17 @@
  */
 
 #include "servo_degree.h"
+#include "printf_lib.h"
 
-extern CAR_CONTROL_t drive;
-
-float get_servo_angle(void) {
+float get_servo_angle(CAR_CONTROL_t * servo) {
     float  on_time = 0;
-    if(drive.MOTOR_STEER_cmd > 180 && drive.MOTOR_STEER_cmd <= 270)
+    if((servo->MOTOR_STEER_cmd + 90) > 180 && servo->MOTOR_STEER_cmd <= 270)
         on_time = 20;
-    else if(drive.MOTOR_STEER_cmd > 270 && drive.MOTOR_STEER_cmd <= 359.99)
+    else if((servo->MOTOR_STEER_cmd + 90) > 270 && servo->MOTOR_STEER_cmd <= 359.99)
         on_time = 10;
     else
-        on_time = 10 + (drive.MOTOR_STEER_cmd * (10 / 180));
+        on_time = 10 + ((servo->MOTOR_STEER_cmd + 90) * (0.05555));
+
+    u0_dbg_printf("percent: %f\n", on_time);
     return on_time;
 }
