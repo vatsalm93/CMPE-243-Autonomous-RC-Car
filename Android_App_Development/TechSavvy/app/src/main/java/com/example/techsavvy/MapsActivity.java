@@ -8,6 +8,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -30,7 +31,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private NavigationView navigationView;
     private GoogleMap mMap;
     private ActionBar actionbar;
-    ToggleButton toggleStart;
+    static ToggleButton toggleStart;
+    static int cmdStartStop_intent = 0;
 
 
     double srcLat, srcLng, dstLat, dstLng;
@@ -48,7 +50,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
-        toggleStart = (ToggleButton) findViewById(R.id.mapButton);
+        //toggleStart = (ToggleButton) findViewById(R.id.mapButton);
 
         navigationView = (NavigationView)findViewById(R.id.NavigationView);
         //Log.i(TAG, "Inside onCreate");
@@ -152,25 +154,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void startButton2OnClick(View view) {
-        Toast.makeText(this, "Button pressed", Toast.LENGTH_LONG).show();
-
+        Toast.makeText(this, "Button pressed", Toast.LENGTH_SHORT).show();
         //Intent intent = new Intent(getApplicationContext(), Bluetooth.class);
-
-        //Send location to Maps
-        /*intent.putExtra("latitude_destination", dstLat);
-        intent.putExtra("longitude_destination", dstLng);*/
-
-        Bluetooth.dstLat = dstLat;
-        Bluetooth.dstLng = dstLng;
-        Bluetooth.flagStartButtonPressed = true;
+        //if(cmdStartStop_intent == 0) {
+        if(Bluetooth.cmdStartStop == false) {
+            Bluetooth.cmdStartStop = true;
+            //cmdStartStop_intent = 1;
+            //intent.putExtra("start_stop_command", cmdStartStop_intent);
+            Bluetooth.dstLat = dstLat;
+            Bluetooth.dstLng = dstLng;
+            Bluetooth.flagStartButtonPressed = true;
+            Log.d("Toggle", "Start");
+        }
+        else if(Bluetooth.cmdStartStop == true)
+        {
+            Bluetooth.cmdStartStop = false;
+            Log.d("Toggle","Stop");
+            //cmdStartStop_intent = 0;
+            Bluetooth.flagStartButtonPressed = true;
+            //intent.putExtra("start_stop_command", cmdStartStop_intent);
+        }
     }
 
     public void onToggleClicked(View view) {
         // Is the toggle on?
         boolean on = ((ToggleButton) view).isChecked();
+        boolean cmdStartStop_intent;
+        Intent intent = new Intent(getApplicationContext(), Bluetooth.class);
         if (on) {
-            Bluetooth.cmdStartStop = "S1";
+            Bluetooth.cmdStartStop = true;
+            cmdStartStop_intent = true;
             Toast.makeText(this, "Button pressed", Toast.LENGTH_LONG).show();
+
+            intent.putExtra("start_stop_command", cmdStartStop_intent);
+
 
             //Intent intent = new Intent(getApplicationContext(), Bluetooth.class);
 
@@ -181,8 +198,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Bluetooth.dstLat = dstLat;
             Bluetooth.dstLng = dstLng;
             Bluetooth.flagStartButtonPressed = true;
+            Log.d("Toggle","Start");
         } else {
-            Bluetooth.cmdStartStop = "S0";
+            Bluetooth.cmdStartStop = false;
+            Log.d("Toggle","Stop");
+            cmdStartStop_intent = false;
+            intent.putExtra("start_stop_command", cmdStartStop_intent);
         }
     }
 }
