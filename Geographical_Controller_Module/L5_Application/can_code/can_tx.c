@@ -32,6 +32,7 @@ bool can_init(void)
     bool val;
 
     if(CAN_init(can1, CAN_BAUDRATE, RX_SIZE_DATA, TX_SIZE_DATA, NULL, NULL)) {
+        CAN_bypass_filter_accept_all_msgs();
         CAN_reset_bus(can1);
         val=true;
     }
@@ -100,7 +101,8 @@ bool transmit_compass_data_on_can(void)
     }*/
 
     float distance = calcDistance(checkpoint_lat, checkpoint_long);
-    //    printf("Distance to checkpoint = %f\n", distance_to_checkpoint);
+   // printf("Distance to checkpoint = %f\n", distance);
+
     compass_msg.CMP_DISTANCE_meters = distance;
 
     dbc_msg_hdr_t msg_hdr = dbc_encode_COMPASS(can_msg.data.bytes, &compass_msg);
@@ -160,7 +162,7 @@ void can_receive(void)
                        setHeartbeat = true;
                        setLED(4,1);
                    }
-                   else if(heartbeat.MASTER_hbt == 1)
+                   else// if(heartbeat.MASTER_hbt == 0)
                    {
                        setHeartbeat = false;
                        setLED(4,0);
