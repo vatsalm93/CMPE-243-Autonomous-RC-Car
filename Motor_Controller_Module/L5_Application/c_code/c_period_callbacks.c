@@ -32,6 +32,7 @@ bool C_period_init(void) {
     eint3_enable_port2(6, eint_falling_edge, eint3_handler);
     lcd_init();
     createPID(&dc);
+
     return true;
 }
 bool C_period_reg_tlm(void) {
@@ -43,13 +44,18 @@ void C_period_1Hz(uint32_t count) {
     motor_can_reset_busoff();
     motor_can_tx_heartbeat();
     send_rpm();
-    lcd_screen_query();
+//    lcd_screen_query();
+    lcd_print();
+
+
+//    u0_dbg_printf("Servo_angle_cmd: %f\n", drive.MOTOR_STEER_cmd);
+//    u0_dbg_printf("servo_angle: %f\n", on_time);
 }
 
 void C_period_10Hz(uint32_t count) {
     (void) count;
-
-    if(count % 3 == 0)
+//    lcd_receive();
+    if(count % 4 == 0)
         calculate_speed();
     command_motor(&drive);
 }
@@ -57,8 +63,10 @@ void C_period_10Hz(uint32_t count) {
 void C_period_100Hz(uint32_t count) {
     (void) count;
     receive_can_msg();
+
     command_servo(&drive);
-    lcd_receive();
+
+
 }
 
 void C_period_1000Hz(uint32_t count) {

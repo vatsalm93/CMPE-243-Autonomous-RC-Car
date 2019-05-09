@@ -132,32 +132,34 @@ void lcd_get_screen_id(char screen_id)
 
 void lcd_print()
 {
-    switch (lcd_screen)
-    {
-        case menu:
-            lcd_print_menu_screen();
-            break;
-        case bridge:
-            lcd_print_bridge_screen();
-            break;
-        case gps:
-            lcd_print_gps_screen();
-            break;
-        case sensor:
-            lcd_print_sensor_screen();
-            break;
-        case motor:
-            lcd_print_motor_screen();
-            break;
-        case home:
-            lcd_print_home_screen();
-            break;
-        case mia:
-            lcd_print_mia_screen();
-            break;
-        default:
-            break;
-    }
+    lcd_print_gps_screen();
+    lcd_print_sensor_screen();
+//    switch (lcd_screen)
+//    {
+//        case menu:
+//            lcd_print_menu_screen();
+//            break;
+//        case bridge:
+//            lcd_print_bridge_screen();
+//            break;
+//        case gps:
+//            lcd_print_gps_screen();
+//            break;
+//        case sensor:
+//            lcd_print_sensor_screen();
+//            break;
+//        case motor:
+//            lcd_print_motor_screen();
+//            break;
+//        case home:
+//            lcd_print_home_screen();
+//            break;
+//        case mia:
+//            lcd_print_mia_screen();
+//            break;
+//        default:
+//            break;
+//    }
 }
 
 void lcd_print_menu_screen()
@@ -172,21 +174,34 @@ void lcd_print_bridge_screen()
 
 void lcd_print_gps_screen()
 {
-    static char string[30];
+    static char string1[100];
+    static char string2[100];
+    static char string3[30];
+    static char string4[100];
 //    double latitude = 29.783493;
-    sprintf(string, "%f", gps_latitude);
-    lcd_put_string(GPS_LATITUDE_OBJ, string, (int)strlen(string));
 
-    sprintf(string, "%f", gps_longitude);
-    lcd_put_string(GPS_LONGITUDE_OBJ, string, (int)strlen(string));
+//    *(double *)string = gps_latitude;
+//    memcpy(string, &gps_latitude, sizeof(gps_latitude));
+        snprintf(string1, sizeof(string1), "%f", gps_latitude );
+    lcd_put_string(GPS_LATITUDE_OBJ, string1, (int)strlen(string1));
+    snprintf(string2, sizeof(string2), "%f", gps_longitude );
+//    sprintf(string2, "%f", gps_longitude);
+    lcd_put_string(GPS_LONGITUDE_OBJ, string2, (int)strlen(string2));
+//    snprintf(string3, sizeof(string3), "%f", gps_latitude );
+    sprintf(string3, "%f", gps_bearing);
+    lcd_put_string(GPS_BEARING_OBJ, string3, (int)strlen(string3));
+//
+//    sprintf(string, "%f", gps_distance);
+//    lcd_put_string(GPS_DISTANCE_OBJ, string, (int)strlen(string));
+    char msb,lsb = 0;
 
-    sprintf(string, "%f", gps_bearing);
-    lcd_put_string(GPS_BEARING_OBJ, string, (int)strlen(string));
 
-    sprintf(string, "%f", gps_distance);
-    lcd_put_string(GPS_DISTANCE_OBJ, string, (int)strlen(string));
+       lsb = (char)((char) gps_bearing & 0xff);
+       msb = (char)((char) ((int)gps_bearing >> 8) & 0xff);
+        lcd_put_comm(WRITE_OBJ, ANGULAR_METER, 0x00, msb, lsb);
+  //  uint32_t lsb = (uint32_t)((uint32_t)gps_bearing & 0x00ff);
+   // uint32_t msb = (uint32_t)((uint32_t)gps_bearing & 0xff00);
 
-    lcd_put_comm(WRITE_OBJ, ANGULAR_METER, 0x00, 0x00, (char)gps_bearing);
 }
 
 void lcd_print_motor_screen()
