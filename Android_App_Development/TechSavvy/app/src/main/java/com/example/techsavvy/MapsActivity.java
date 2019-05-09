@@ -20,6 +20,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
@@ -33,6 +34,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ActionBar actionbar;
     static ToggleButton toggleStart;
     static int cmdStartStop_intent = 0;
+    static Marker srcMarker;
+    static Marker dstMarker;
+    static Marker currentMarker;
 
 
     //double srcLat, srcLng, dstLat, dstLng;
@@ -119,8 +123,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toast.makeText(this, markerDisplay, Toast.LENGTH_LONG).show();
 
         // Add a marker and move the camera
-        mMap.addMarker(new MarkerOptions().position(sourceLocation).title(markerDisplay));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sourceLocation, 15));
+        srcMarker = mMap.addMarker(new MarkerOptions().position(sourceLocation).title(markerDisplay));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sourceLocation, 16));
     }
 
     @Override
@@ -143,13 +147,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Add source marker
         LatLng Source = new LatLng(Bluetooth.srcLat , Bluetooth.srcLng);
-        mMap.addMarker(new MarkerOptions().position(Source).title("Source"));
+        //LatLng currentPos = new LatLng(Bluetooth.currentLat , Bluetooth.currentLng);
+        srcMarker = mMap.addMarker(new MarkerOptions().position(Source).title("Source"));
+        //dstMarker = mMap.addMarker(new MarkerOptions().position(currentPos).title("Current Position").icon(BitmapDescriptorFactory
+                //.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+
 
         //Add destination marker.. Make it Green color
         latitudeStr = String.valueOf(lat2Dec);
         longitudeStr = String.valueOf(long2Dec);
         String markerDisplay = "Dest - Lat: " + latitudeStr + "   Long: " + longitudeStr;
-        mMap.addMarker(new MarkerOptions().position(latLng).title(markerDisplay).icon(BitmapDescriptorFactory
+        dstMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(markerDisplay).icon(BitmapDescriptorFactory
                 .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
     }
 
@@ -165,6 +173,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Bluetooth.dstLng = dstLng;
             Bluetooth.flagStartButtonPressed = true;
             Log.d("Toggle", "Start");
+            //threadLiveLocation.start();
         }
         else if(Bluetooth.cmdStartStop == true)
         {
@@ -173,6 +182,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //cmdStartStop_intent = 0;
             Bluetooth.flagStartButtonPressed = true;
             //intent.putExtra("start_stop_command", cmdStartStop_intent);
+
         }
     }
 
@@ -202,5 +212,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             intent.putExtra("start_stop_command", cmdStartStop_intent);
         }
     }*/
+
+    /*Thread threadLiveLocation = new Thread() {
+        @Override
+        public void run() {
+            try {
+                while(true) {
+                    sleep(1000);
+
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    };*/
+
+
 }
 

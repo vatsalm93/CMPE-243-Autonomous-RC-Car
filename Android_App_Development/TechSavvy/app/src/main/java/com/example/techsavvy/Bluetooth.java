@@ -176,17 +176,13 @@ public class Bluetooth extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
         //intent.putExtra("placeNumber", 12);
 
-        //Copy incoming location data from bluetooth
-        double latitude =  (double)mlat_rx;
-        double longitude = (double)mlong_rx;
-
         //Hard Coded SJSU values
         /*double latitude =  37.3352;
         double longitude = -121.8811;*/
 
         //Send location to Maps
-        intent.putExtra("latitude", latitude);
-        intent.putExtra("longitude", longitude);
+        intent.putExtra("latitude", currentLat);
+        intent.putExtra("longitude", currentLng);
         startActivity(intent);
     }
 
@@ -204,11 +200,13 @@ public class Bluetooth extends AppCompatActivity {
                         if (item.equalsIgnoreCase("Lat")) {
                             if (value != null && (!value.isEmpty())&& isNumeric(value)) {
                                 mlat_rx = Float.parseFloat(value);
+                                currentLat = (double)mlat_rx;
                             }
                             mlatitude.setText(value);
                         } else if (item.equalsIgnoreCase("Long")) {
                             if (value != null && (!value.isEmpty())&& isNumeric(value)) {
                                 mlong_rx = Float.parseFloat(value);
+                                currentLng = (double)mlong_rx;
                             }
                             mlongitude.setText(value);
                         }
