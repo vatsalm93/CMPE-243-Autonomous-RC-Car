@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define KP      0.005
+#define KP      0.0055
 #define KI      0.000025
 #define KD      0.0005
 #define DT      0.1

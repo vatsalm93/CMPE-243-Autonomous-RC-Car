@@ -7,6 +7,7 @@
 
 #include "c_pwm.h"
 #include "lpc_pwm.hpp"
+//#include "printf_lib.h"
 // Assuming UART2 is already initialized
 // You may want to also add uart2_init() in C
 
@@ -28,5 +29,6 @@ bool set_pwm_value(pwm_pin_t pwm_pin, float percent) {
             flag = servo_control->set(percent);
             break;
     }
+//    u0_dbg_printf("pwm set to: %f\n", percent);
     return flag;
 }
