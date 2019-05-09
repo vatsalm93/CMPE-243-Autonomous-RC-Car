@@ -37,6 +37,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     static Marker srcMarker;
     static Marker dstMarker;
     static Marker currentMarker;
+    boolean isDstSet = false;
 
 
     //double srcLat, srcLng, dstLat, dstLng;
@@ -130,7 +131,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapLongClick(LatLng latLng) {
         //Clear Map to remove previous markers
-        mMap.clear();
+        //mMap.clear();
+        if(isDstSet)
+        {
+            dstMarker.remove();
+        }
+        else
+            isDstSet = true;
+
         Bluetooth.dstLat = latLng.latitude;
         Bluetooth.dstLng = latLng.longitude;
 
@@ -146,9 +154,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toast.makeText(this, toastDisplay, Toast.LENGTH_SHORT).show();
 
         // Add source marker
-        LatLng Source = new LatLng(Bluetooth.srcLat , Bluetooth.srcLng);
+        //LatLng Source = new LatLng(Bluetooth.srcLat , Bluetooth.srcLng);
         //LatLng currentPos = new LatLng(Bluetooth.currentLat , Bluetooth.currentLng);
-        srcMarker = mMap.addMarker(new MarkerOptions().position(Source).title("Source"));
+        //srcMarker = mMap.addMarker(new MarkerOptions().position(Source).title("Source"));
         //dstMarker = mMap.addMarker(new MarkerOptions().position(currentPos).title("Current Position").icon(BitmapDescriptorFactory
                 //.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
 
