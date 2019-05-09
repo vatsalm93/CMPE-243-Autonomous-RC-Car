@@ -60,8 +60,12 @@ public class Bluetooth extends AppCompatActivity {
     private CheckBox mStop;
     private static float mlat_rx;
     private static float mlong_rx;
+    static double srcLat = 0.00;
+    static double srcLng = 0.00;
     static double dstLat = 0.00;
     static double dstLng = 0.00;
+    static double currentLat = 0.00;
+    static double currentLng = 0.00;
     private static float mcompass_rx;
     static boolean cmdStartStop = false;
     static boolean flagStartButtonPressed;

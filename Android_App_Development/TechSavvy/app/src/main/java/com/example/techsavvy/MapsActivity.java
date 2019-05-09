@@ -35,7 +35,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     static int cmdStartStop_intent = 0;
 
 
-    double srcLat, srcLng, dstLat, dstLng;
+    //double srcLat, srcLng, dstLat, dstLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,16 +96,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Intent intent = getIntent();
         //Get Longitude and Latitude Values
-        srcLat = intent.getDoubleExtra("latitude", 37.3352);
-        srcLng = intent.getDoubleExtra("longitude", -121.8811);
+        Bluetooth.srcLat = intent.getDoubleExtra("latitude", 37.3352);
+        Bluetooth.srcLng = intent.getDoubleExtra("longitude", -121.8811);
 
-        if(srcLat == 0.00 || srcLng == 0.00){
-            srcLat = 37.3352;
-            srcLng = -121.8811;
+        if(Bluetooth.srcLat == 0.00 || Bluetooth.srcLng == 0.00){
+            Bluetooth.srcLat = 37.3352;
+            Bluetooth.srcLng = -121.8811;
         }
 
         //Create Obj Location
-        LatLng sourceLocation = new LatLng(srcLat , srcLng);
+        LatLng sourceLocation = new LatLng(Bluetooth.srcLat , Bluetooth.srcLng);
 
         //Round value to 2-decimal to test accuracy of GPS location
         //https://stackoverflow.com/questions/5945867/how-to-round-the-double-value-to-2-decimal-points
@@ -113,8 +113,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         double long2Dec = (Math.round(srcLng * 100.0))/100.0;*/
 
         //Convert to string for logging the values
-        String latitudeStr = String.valueOf(srcLat);
-        String longitudeStr = String.valueOf(srcLng);
+        String latitudeStr = String.valueOf(Bluetooth.srcLat);
+        String longitudeStr = String.valueOf(Bluetooth.srcLng);
         String markerDisplay = "Lat: " + latitudeStr + "   Long: " + longitudeStr;
         Toast.makeText(this, markerDisplay, Toast.LENGTH_LONG).show();
 
@@ -127,22 +127,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapLongClick(LatLng latLng) {
         //Clear Map to remove previous markers
         mMap.clear();
-        dstLat = latLng.latitude;
-        dstLng = latLng.longitude;
+        Bluetooth.dstLat = latLng.latitude;
+        Bluetooth.dstLng = latLng.longitude;
 
         //Round value to 2-decimal to test accuracy of GPS location
         //https://stackoverflow.com/questions/5945867/how-to-round-the-double-value-to-2-decimal-points
-        double lat2Dec = (Math.round(dstLat * 1000000.0))/1000000.0;
-        double long2Dec = (Math.round(dstLng * 1000000.0))/1000000.0;
+        double lat2Dec = (Math.round(Bluetooth.dstLat * 1000000.0))/1000000.0;
+        double long2Dec = (Math.round(Bluetooth.dstLng * 1000000.0))/1000000.0;
 
         //Convert to string for logging the values
-        String latitudeStr = String.valueOf(dstLat);
-        String longitudeStr = String.valueOf(dstLng);
+        String latitudeStr = String.valueOf(Bluetooth.dstLat);
+        String longitudeStr = String.valueOf(Bluetooth.dstLng);
         String toastDisplay = "Dest - Lat: " + latitudeStr + "   Long: " + longitudeStr;
-        Toast.makeText(this, toastDisplay, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, toastDisplay, Toast.LENGTH_SHORT).show();
 
         // Add source marker
-        LatLng Source = new LatLng(srcLat , srcLng);
+        LatLng Source = new LatLng(Bluetooth.srcLat , Bluetooth.srcLng);
         mMap.addMarker(new MarkerOptions().position(Source).title("Source"));
 
         //Add destination marker.. Make it Green color
@@ -161,8 +161,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Bluetooth.cmdStartStop = true;
             //cmdStartStop_intent = 1;
             //intent.putExtra("start_stop_command", cmdStartStop_intent);
-            Bluetooth.dstLat = dstLat;
-            Bluetooth.dstLng = dstLng;
+            //Bluetooth.dstLat = dstLat;
+            //Bluetooth.dstLng = dstLng;
             Bluetooth.flagStartButtonPressed = true;
             Log.d("Toggle", "Start");
         }
@@ -176,7 +176,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public void onToggleClicked(View view) {
+    /*public void onToggleClicked(View view) {
         // Is the toggle on?
         boolean on = ((ToggleButton) view).isChecked();
         boolean cmdStartStop_intent;
@@ -189,11 +189,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             intent.putExtra("start_stop_command", cmdStartStop_intent);
 
 
-            //Intent intent = new Intent(getApplicationContext(), Bluetooth.class);
 
-            //Send location to Maps
-        /*intent.putExtra("latitude_destination", dstLat);
-        intent.putExtra("longitude_destination", dstLng);*/
 
             Bluetooth.dstLat = dstLat;
             Bluetooth.dstLng = dstLng;
@@ -205,6 +201,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             cmdStartStop_intent = false;
             intent.putExtra("start_stop_command", cmdStartStop_intent);
         }
-    }
+    }*/
 }
 
