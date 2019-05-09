@@ -238,6 +238,29 @@
                 android:maxLines="2"
                 android:text="&lt;Longitude>" />
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:maxLines="5"
+                android:text="Distance GPS: "
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/Distance_GPS"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="&lt;distance>" />
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

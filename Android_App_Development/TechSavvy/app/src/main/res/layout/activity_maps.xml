@@ -21,16 +21,15 @@ tools:context=".MapsActivity"
     class="com.google.android.gms.maps.SupportMapFragment"/>
     <include layout="@layout/toolbar_layout" />
 
-    <ToggleButton
+    <Button
         android:id="@+id/mapButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_margin="@dimen/map_margin"
         android:background="@android:color/holo_green_dark"
-        android:textOff="START"
-        android:textOn="STOP"
-        android:onClick="onToggleClicked"/>
+        android:text="Start/Stop"
+        android:onClick="startButton2OnClick" />
 
 </FrameLayout>
 

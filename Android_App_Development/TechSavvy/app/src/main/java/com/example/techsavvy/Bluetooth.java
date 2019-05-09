@@ -49,6 +49,7 @@ public class Bluetooth extends AppCompatActivity {
     private static TextView mlatitude;
     private static TextView mlongitude;
     private static TextView mcompass;
+    private static TextView mdistance;
     private Button mListPairedDevicesBtn;
     private Button mDiscoverBtn;
     private BluetoothAdapter mBTAdapter;
@@ -62,7 +63,7 @@ public class Bluetooth extends AppCompatActivity {
     static double dstLat = 0.00;
     static double dstLng = 0.00;
     private static float mcompass_rx;
-    static String cmdStartStop = "S0";
+    static boolean cmdStartStop = false;
     static boolean flagStartButtonPressed;
 
 
@@ -100,6 +101,7 @@ public class Bluetooth extends AppCompatActivity {
         mobsRight=(TextView) findViewById(R.id.obsRight_rx);
        mobsLeft=(TextView) findViewById(R.id.obsLeft_rx);
         mobsBack=(TextView) findViewById(R.id.obsBack_rx);
+        mdistance = (TextView) findViewById(R.id.Distance_GPS);
         mStart = (CheckBox)findViewById(R.id.start);
 
         mBTArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
@@ -239,6 +241,10 @@ public class Bluetooth extends AppCompatActivity {
                     else if(item.equalsIgnoreCase("ObsBack"))
                     {
                         mobsBack.setText(value);
+                    }
+                    else if(item.equalsIgnoreCase("Distance"))
+                    {
+                        mdistance.setText(value);
                     }
 
                 }
@@ -402,29 +408,46 @@ public class Bluetooth extends AppCompatActivity {
                         mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                                 .sendToTarget(); // Send the obtained bytes to the UI activity
                     }
-                    /*Intent intent = getIntent();
+                    //Intent intent = getIntent();
                     //Get Longitude and Latitude Values
-                    dstLat = intent.getDoubleExtra("latitude", 15.00);
-                    dstLng = intent.getDoubleExtra("longitude", 25.00);*/
+                    //Boolean cmdStartStop_intent = getIntent().getExtras().getBoolean("start_stop_command");
 
-                    if(dstLat>25 && dstLng < 0 && flagStartButtonPressed)
+                    //int cmdStartStop_intent = intent.getIntExtra("start_stop_command", 5);
+
+
+                    if(flagStartButtonPressed)
                     {
                         //Convert destination values to string
+                        //boolean cmdStartStop_intent = intent.getBooleanExtra("start_stop_command", true);
+                        //Boolean cmdStartStop_intent = getIntent()("start_stop_command");
                         String latitudeStr = "Lat:" + String.valueOf(dstLat);
                         String longitudeStr = "Long:" + String.valueOf(dstLng);
-                        write(latitudeStr);
+                        if(cmdStartStop == true) {
+                        //if(cmdStartStop_intent == 1) {
+                            mConnectedThread.write("S1");
+                            Log.i("Bluetooth start","start");
+                            //cmdStartStop_intent = 0;
+                            //cmdStartStop = false;
+                        }
+                        //else if((cmdStartStop_intent == 0 )) {
+                        else if(cmdStartStop == false ) {
+                            mConnectedThread.write("S0");
+                            Log.i("Bluetooth stop","stop");
+                            //cmdStartStop_intent = true;
+                        }
+
                         SystemClock.sleep(100);
-                        write(longitudeStr);
+                        mConnectedThread.write(latitudeStr);
                         SystemClock.sleep(100);
-                        write("0");
+                        mConnectedThread.write(longitudeStr);
+                        SystemClock.sleep(100);
+                        mConnectedThread.write("0");
                         Log.d("Lat for Dst", latitudeStr);
                         Log.d("Long for Dst", longitudeStr);
                         dstLat = dstLng = 0.00;
                         //Toast.makeText(this, "Button pressed", Toast.LENGTH_SHORT).show();
                         flagStartButtonPressed = false;
-                        write(cmdStartStop);
                     }
-
                 }
                 catch (IOException e) {
                     e.printStackTrace();
