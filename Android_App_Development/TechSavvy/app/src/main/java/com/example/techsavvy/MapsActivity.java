@@ -1,6 +1,7 @@
 package com.example.techsavvy;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -38,6 +39,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     static Marker dstMarker;
     static Marker currentMarker;
     boolean isDstSet = false;
+    private static locationThread liveLocationThread;
 
 
     //double srcLat, srcLng, dstLat, dstLng;
@@ -54,6 +56,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
+
+        liveLocationThread = new locationThread();
+        liveLocationThread.start();
 
         //toggleStart = (ToggleButton) findViewById(R.id.mapButton);
 
@@ -108,6 +113,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Bluetooth.srcLat = 37.3352;
             Bluetooth.srcLng = -121.8811;
         }
+
+        
 
         //Create Obj Location
         LatLng sourceLocation = new LatLng(Bluetooth.srcLat , Bluetooth.srcLng);
@@ -181,7 +188,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Bluetooth.dstLng = dstLng;
             Bluetooth.flagStartButtonPressed = true;
             Log.d("Toggle", "Start");
-            //threadLiveLocation.start();
+
         }
         else if(Bluetooth.cmdStartStop == true)
         {
@@ -221,19 +228,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }*/
 
-    /*Thread threadLiveLocation = new Thread() {
+    class locationThread extends Thread {
         @Override
         public void run() {
             try {
                 while(true) {
                     sleep(1000);
-
+                    Log.d("Location Thread msg","Thread running !!");
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-    };*/
+    };
 
 
 }
