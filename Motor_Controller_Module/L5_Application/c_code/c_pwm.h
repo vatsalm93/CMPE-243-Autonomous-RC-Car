@@ -19,9 +19,10 @@ typedef enum {
     servo_2 = 2,
 }pwm_pin_t;
 
+float pwm_val;
 void init_pwm(long unsigned int freq);
 bool set_pwm_value(pwm_pin_t pwm_pin, float percent);
-
+float get_pwm_value(void);
 #ifdef __cplusplus
 }
 #endif

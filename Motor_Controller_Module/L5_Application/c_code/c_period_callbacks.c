@@ -44,17 +44,12 @@ void C_period_1Hz(uint32_t count) {
     motor_can_reset_busoff();
     motor_can_tx_heartbeat();
     send_rpm();
-//    lcd_screen_query();
-    lcd_print();
-
-
-//    u0_dbg_printf("Servo_angle_cmd: %f\n", drive.MOTOR_STEER_cmd);
-//    u0_dbg_printf("servo_angle: %f\n", on_time);
+    lcd_screen_query();
 }
 
 void C_period_10Hz(uint32_t count) {
     (void) count;
-//    lcd_receive();
+    lcd_receive();
     if(count % 4 == 0)
         calculate_speed();
     command_motor(&drive);
@@ -63,14 +58,10 @@ void C_period_10Hz(uint32_t count) {
 void C_period_100Hz(uint32_t count) {
     (void) count;
     receive_can_msg();
-
     command_servo(&drive);
-
-
 }
 
 void C_period_1000Hz(uint32_t count) {
     (void) count;
-
 }
 

@@ -38,11 +38,12 @@ typedef enum
 {
     menu,
     bridge,
-    gps,
+    compass,
     sensor,
     motor,
     home,
-    mia
+    mia,
+    gps
 } lcd_screen_t;
 
 typedef struct
@@ -70,6 +71,7 @@ void lcd_print_motor_screen();
 void lcd_print_sensor_screen();
 void lcd_print_home_screen();
 void lcd_print_mia_screen();
+void lcd_print_compass_screen();
 void lcd_put_string(char obj_num, char *data, int data_size);
 
 #ifdef __cplusplus

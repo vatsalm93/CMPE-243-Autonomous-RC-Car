@@ -11,7 +11,7 @@
 #include "can.h"
 #include "c_io.h"
 #include "speed_calculator.h"
-#include "generated_can.h"
+#include "_can_dbc/generated_can.h"
 
 
 #ifdef __cplusplus
@@ -20,15 +20,22 @@ extern "C" {
 
 extern CAR_CONTROL_t drive;
 
-char led_digit_front_obs;
+int led_digit_front_obs;
 char led_digit_left_obs;
 char led_digit_right_obs;
 char led_digit_back_obs;
 
-float gps_latitude;
-float gps_longitude;
+float gps_cur_latitude;
+float gps_cur_longitude;
+float gps_dest_latitude;
+float gps_dest_longitude;
 float gps_bearing;
+float gps_heading;
 float gps_distance;
+float motor_speed;
+float motor_turning_angle;
+
+uint8_t master_status, sensor_status, gps_status, bridge_status;
 
 bool receive_can_msg(void);
 

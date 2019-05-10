@@ -24,11 +24,15 @@ bool set_pwm_value(pwm_pin_t pwm_pin, float percent) {
     switch(pwm_pin) {
         case motor_1:
             flag = motor_control->set(percent);
+            pwm_val = percent;
             break;
         case servo_2:
             flag = servo_control->set(percent);
             break;
     }
-//    u0_dbg_printf("pwm set to: %f\n", percent);
     return flag;
 }
+
+float get_pwm_value(void) {
+return pwm_val;
+        }
