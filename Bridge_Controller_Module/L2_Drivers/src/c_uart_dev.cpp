@@ -24,8 +24,13 @@ extern "C"
         return(Uart2::getInstance().putChar(out, timeout));
     }
 
-    void cputline(const char *pBuff, unsigned int timeout)
+    void cputline(char *pBuff, unsigned int timeout)
     {
        Uart2::getInstance().putline(pBuff,timeout);
+    }
+
+    bool cgets(char* pBuff, int maxLen, unsigned int timeout)
+    {
+       return( Uart2::getInstance().gets(pBuff,maxLen,timeout));
     }
 }
