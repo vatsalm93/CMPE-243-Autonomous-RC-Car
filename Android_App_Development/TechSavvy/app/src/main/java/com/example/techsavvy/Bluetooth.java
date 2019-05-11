@@ -200,15 +200,15 @@ public class Bluetooth extends AppCompatActivity {
                         if (item.equalsIgnoreCase("Lat")) {
                             if (value != null && (!value.isEmpty())&& isNumeric(value)) {
                                 mlat_rx = Float.parseFloat(value);
-                                //currentLat = (double)mlat_rx;
-                                currentLat = 37.335003;
+                                currentLat = (double)mlat_rx;
+                                //currentLat = 37.335003;
                             }
                             mlatitude.setText(value);
                         } else if (item.equalsIgnoreCase("Long")) {
                             if (value != null && (!value.isEmpty())&& isNumeric(value)) {
                                 mlong_rx = Float.parseFloat(value);
-                                //currentLng = (double)mlong_rx;
-                                currentLng = -121.887446;
+                                currentLng = (double)mlong_rx;
+                                //currentLng = -121.887446;
                             }
                             mlongitude.setText(value);
                         }

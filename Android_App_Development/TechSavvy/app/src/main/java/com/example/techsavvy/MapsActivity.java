@@ -83,38 +83,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        /*liveLocationThread = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                while (true) {
-                    try {
-                        Thread.sleep(1000);
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                //Log.d("Location Thread msg","Thread running !!");
-                                if(isCurrentSet)
-                                {
-                                    currentMarker.remove();
-                                }
-                                else
-                                    isCurrentSet = true;
-
-                                LatLng currentPos = new LatLng(Bluetooth.currentLat , Bluetooth.currentLng);
-                                currentMarker = mMap.addMarker(new MarkerOptions().position(currentPos).title("Current Position").icon(BitmapDescriptorFactory
-                                        .defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
-                            }
-                        });
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-        };*/
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -165,7 +133,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Add a marker and move the camera
         srcMarker = mMap.addMarker(new MarkerOptions().position(sourceLocation).title(markerDisplay));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sourceLocation, 16));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sourceLocation, 18));
     }
 
     @Override
@@ -213,6 +181,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toast.makeText(this, "Button pressed", Toast.LENGTH_SHORT).show();
         //Intent intent = new Intent(getApplicationContext(), Bluetooth.class);
         //if(cmdStartStop_intent == 0) {
+        //Start Car
         if(Bluetooth.cmdStartStop == false) {
             Bluetooth.cmdStartStop = true;
             //cmdStartStop_intent = 1;
@@ -226,6 +195,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         }
+        //STop Car
         else if(Bluetooth.cmdStartStop == true)
         {
             Bluetooth.cmdStartStop = false;
@@ -233,6 +203,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //cmdStartStop_intent = 0;
             Bluetooth.flagStartButtonPressed = true;
             //intent.putExtra("start_stop_command", cmdStartStop_intent);
+            isCurrentSet = false;
 
         }
     }
@@ -247,12 +218,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         @Override
                         public void run() {
                             Log.d("Location Thread msg","Thread running !!");
-                            /*if(isCurrentSet)
+                            if(isCurrentSet)
                             {
                                 currentMarker.remove();
                             }
                             else
-                                isCurrentSet = true;*/
+                                isCurrentSet = true;
+
+                            if(Bluetooth.currentLat == 0.00 || Bluetooth.currentLng == 0.00){
+                                Bluetooth.currentLat = Bluetooth.srcLat + 0.0001 ;
+                                Bluetooth.currentLng = Bluetooth.srcLng + 0.0001 ;
+                            }
+
 
                             LatLng currentPos = new LatLng(Bluetooth.currentLat , Bluetooth.currentLng);
                             currentMarker = mMap.addMarker(new MarkerOptions().position(currentPos).title("Current Position").icon(BitmapDescriptorFactory
