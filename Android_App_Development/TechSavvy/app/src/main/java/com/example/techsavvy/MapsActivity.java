@@ -43,8 +43,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     locationThread liveLocationThread;
 
 
-    //double srcLat, srcLng, dstLat, dstLng;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,10 +55,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
-
-        //liveLocationThread = new locationThread();
-
-        //toggleStart = (ToggleButton) findViewById(R.id.mapButton);
 
         navigationView = (NavigationView)findViewById(R.id.NavigationView);
         //Log.i(TAG, "Inside onCreate");
@@ -178,33 +172,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void startButton2OnClick(View view) {
-        Toast.makeText(this, "Button pressed", Toast.LENGTH_SHORT).show();
-        //Intent intent = new Intent(getApplicationContext(), Bluetooth.class);
-        //if(cmdStartStop_intent == 0) {
         //Start Car
         if(Bluetooth.cmdStartStop == false) {
             Bluetooth.cmdStartStop = true;
-            //cmdStartStop_intent = 1;
-            //intent.putExtra("start_stop_command", cmdStartStop_intent);
-            //Bluetooth.dstLat = dstLat;
-            //Bluetooth.dstLng = dstLng;
             Bluetooth.flagStartButtonPressed = true;
             Log.d("Toggle", "Start");
+            Toast.makeText(this, "Car START..", Toast.LENGTH_SHORT).show();
+            //isCurrentSet = true;
             liveLocationThread = new locationThread();
             liveLocationThread.start();
-
-
         }
         //STop Car
         else if(Bluetooth.cmdStartStop == true)
         {
             Bluetooth.cmdStartStop = false;
             Log.d("Toggle","Stop");
-            //cmdStartStop_intent = 0;
             Bluetooth.flagStartButtonPressed = true;
-            //intent.putExtra("start_stop_command", cmdStartStop_intent);
-            isCurrentSet = false;
-
+            Toast.makeText(this, "Car STOP..", Toast.LENGTH_SHORT).show();
+            /*if(isCurrentSet)
+            {
+                currentMarker.remove();
+            }
+            isCurrentSet = false;*/
+            //liveLocationThread.st
         }
     }
 
@@ -230,15 +220,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 Bluetooth.currentLng = Bluetooth.srcLng + 0.0001 ;
                             }
 
+                            //Convert to string for logging the values
+                            String latitudeStr = String.valueOf(Bluetooth.currentLat);
+                            String longitudeStr = String.valueOf(Bluetooth.currentLng);
+                            String markerMessage = "Curr Pos - Lat: " + latitudeStr + "   Long: " + longitudeStr;
 
                             LatLng currentPos = new LatLng(Bluetooth.currentLat , Bluetooth.currentLng);
-                            currentMarker = mMap.addMarker(new MarkerOptions().position(currentPos).title("Current Position").icon(BitmapDescriptorFactory
+                            currentMarker = mMap.addMarker(new MarkerOptions().position(currentPos).title(markerMessage).icon(BitmapDescriptorFactory
                                     .defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
-
                         }
                     });
-
-
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
