@@ -194,7 +194,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 currentMarker.remove();
             }
             isCurrentSet = false;*/
-            //liveLocationThread.st
+            liveLocationThread.cancel();
+            currentMarker.remove();
         }
     }
 
@@ -202,7 +203,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void run() {
             try {
-                while(true) {
+                while(!Thread.currentThread().isInterrupted()) {
                     sleep(1000);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -234,6 +235,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+        public void cancel() {
+            interrupt();
         }
     };
 
