@@ -31,7 +31,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    private GoogleMap mMap;
+    public GoogleMap mMap;
     private ActionBar actionbar;
     static ToggleButton toggleStart;
     static int cmdStartStop_intent = 0;
@@ -39,7 +39,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     static Marker dstMarker;
     static Marker currentMarker;
     boolean isDstSet = false;
-    private static locationThread liveLocationThread;
+    boolean isCurrentSet = false;
+    locationThread liveLocationThread;
 
 
     //double srcLat, srcLng, dstLat, dstLng;
@@ -57,8 +58,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
-        liveLocationThread = new locationThread();
-        liveLocationThread.start();
+        //liveLocationThread = new locationThread();
 
         //toggleStart = (ToggleButton) findViewById(R.id.mapButton);
 
@@ -82,6 +82,39 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        /*liveLocationThread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Log.d("Location Thread msg","Thread running !!");
+                                if(isCurrentSet)
+                                {
+                                    currentMarker.remove();
+                                }
+                                else
+                                    isCurrentSet = true;
+
+                                LatLng currentPos = new LatLng(Bluetooth.currentLat , Bluetooth.currentLng);
+                                currentMarker = mMap.addMarker(new MarkerOptions().position(currentPos).title("Current Position").icon(BitmapDescriptorFactory
+                                        .defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                            }
+                        });
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+        };*/
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -114,7 +147,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Bluetooth.srcLng = -121.8811;
         }
 
-        
+
 
         //Create Obj Location
         LatLng sourceLocation = new LatLng(Bluetooth.srcLat , Bluetooth.srcLng);
@@ -188,6 +221,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Bluetooth.dstLng = dstLng;
             Bluetooth.flagStartButtonPressed = true;
             Log.d("Toggle", "Start");
+            liveLocationThread = new locationThread();
+            liveLocationThread.start();
+
 
         }
         else if(Bluetooth.cmdStartStop == true)
@@ -201,40 +237,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    /*public void onToggleClicked(View view) {
-        // Is the toggle on?
-        boolean on = ((ToggleButton) view).isChecked();
-        boolean cmdStartStop_intent;
-        Intent intent = new Intent(getApplicationContext(), Bluetooth.class);
-        if (on) {
-            Bluetooth.cmdStartStop = true;
-            cmdStartStop_intent = true;
-            Toast.makeText(this, "Button pressed", Toast.LENGTH_LONG).show();
-
-            intent.putExtra("start_stop_command", cmdStartStop_intent);
-
-
-
-
-            Bluetooth.dstLat = dstLat;
-            Bluetooth.dstLng = dstLng;
-            Bluetooth.flagStartButtonPressed = true;
-            Log.d("Toggle","Start");
-        } else {
-            Bluetooth.cmdStartStop = false;
-            Log.d("Toggle","Stop");
-            cmdStartStop_intent = false;
-            intent.putExtra("start_stop_command", cmdStartStop_intent);
-        }
-    }*/
-
     class locationThread extends Thread {
         @Override
         public void run() {
             try {
                 while(true) {
                     sleep(1000);
-                    Log.d("Location Thread msg","Thread running !!");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("Location Thread msg","Thread running !!");
+                            /*if(isCurrentSet)
+                            {
+                                currentMarker.remove();
+                            }
+                            else
+                                isCurrentSet = true;*/
+
+                            LatLng currentPos = new LatLng(Bluetooth.currentLat , Bluetooth.currentLng);
+                            currentMarker = mMap.addMarker(new MarkerOptions().position(currentPos).title("Current Position").icon(BitmapDescriptorFactory
+                                    .defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+
+                        }
+                    });
+
+
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
