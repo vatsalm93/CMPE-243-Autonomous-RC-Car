@@ -28,7 +28,7 @@ tools:context=".MapsActivity"
         android:layout_gravity="bottom"
         android:layout_margin="@dimen/map_margin"
         android:background="@android:color/holo_green_dark"
-        android:text="Start/Stop"
+        android:text="Start"
         android:onClick="startButton2OnClick" />
 
 </FrameLayout>

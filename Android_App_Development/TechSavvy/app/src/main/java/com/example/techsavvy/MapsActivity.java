@@ -1,6 +1,7 @@
 package com.example.techsavvy;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -12,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -23,7 +25,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
@@ -33,14 +36,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private NavigationView navigationView;
     public GoogleMap mMap;
     private ActionBar actionbar;
-    static ToggleButton toggleStart;
+    static Button startStopButton;
     static int cmdStartStop_intent = 0;
     static Marker srcMarker;
     static Marker dstMarker;
     static Marker currentMarker;
     boolean isDstSet = false;
     boolean isCurrentSet = false;
+    boolean isPolyLineSet = false;
     locationThread liveLocationThread;
+    Polyline line;
 
 
     @Override
@@ -76,6 +81,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        startStopButton = (Button) findViewById(R.id.mapButton);
 
     }
 
@@ -178,7 +184,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Bluetooth.flagStartButtonPressed = true;
             Log.d("Toggle", "Start");
             Toast.makeText(this, "Car START..", Toast.LENGTH_SHORT).show();
+            startStopButton.setText("STOP");
+            startStopButton.setBackgroundColor(Color.RED);
             //isCurrentSet = true;
+            //line.remove();
+            /*if(isPolyLineSet)
+                line.remove();
+            else
+                isPolyLineSet = true;*/
+
+            line = mMap.addPolyline(new PolylineOptions()
+                    .add(new LatLng(Bluetooth.srcLat, Bluetooth.srcLng), new LatLng(Bluetooth.dstLat, Bluetooth.dstLng))
+                    .width(12)
+                    .color(Color.RED));
             liveLocationThread = new locationThread();
             liveLocationThread.start();
         }
@@ -189,13 +207,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Log.d("Toggle","Stop");
             Bluetooth.flagStartButtonPressed = true;
             Toast.makeText(this, "Car STOP..", Toast.LENGTH_SHORT).show();
-            /*if(isCurrentSet)
-            {
-                currentMarker.remove();
-            }
-            isCurrentSet = false;*/
+            startStopButton.setText("START");
+            startStopButton.setBackgroundColor(Color.GREEN);
             liveLocationThread.cancel();
             currentMarker.remove();
+            line.remove();
         }
     }
 
@@ -228,7 +244,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             LatLng currentPos = new LatLng(Bluetooth.currentLat , Bluetooth.currentLng);
                             currentMarker = mMap.addMarker(new MarkerOptions().position(currentPos).title(markerMessage).icon(BitmapDescriptorFactory
-                                    .defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                                    .defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
                         }
                     });
                 }
