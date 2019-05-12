@@ -29,7 +29,7 @@ bool C_period_init(void) {
     set_pwm_value(motor_1, 15);
     set_pwm_value(servo_2, 15);
     GPIO_interrupt();
-    eint3_enable_port2(6, eint_falling_edge, eint3_handler);
+    eint3_enable_port2(5, eint_falling_edge, eint3_handler);
     lcd_init();
     createPID(&dc);
 

@@ -11,6 +11,6 @@
 GPIO *gpio;
 
 void GPIO_interrupt(void) {
-     gpio = new GPIO(P2_6);
+     gpio = new GPIO(P2_5);
      gpio->setAsInput();
 }
