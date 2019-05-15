@@ -20,7 +20,8 @@
 #include "printf_lib.h"
 #include "rpm/c_pid.h"
 
-s_pid_t dc = {0};
+extern s_pid_t dc;
+double pwm_val_dc = 15.00;
 
 bool C_period_init(void) {
     setLED(1, 0);
@@ -52,7 +53,7 @@ void C_period_10Hz(uint32_t count) {
     lcd_receive();
     if(count % 4 == 0)
         calculate_speed();
-    command_motor(&drive);
+    command_motor(&drive, &pwm_val_dc);
 }
 
 void C_period_100Hz(uint32_t count) {

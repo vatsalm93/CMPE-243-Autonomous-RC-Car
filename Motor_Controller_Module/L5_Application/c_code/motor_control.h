@@ -18,9 +18,9 @@
 extern "C" {
 #endif
 
-void command_motor(CAR_CONTROL_t *drive_motor);
+void command_motor(CAR_CONTROL_t *drive_motor, double *cmd_pwm_val);
 void command_servo(CAR_CONTROL_t *drive_motor);
-void forward_speed_control(CAR_CONTROL_t *drive_forward);
+void forward_speed_control(CAR_CONTROL_t *drive_forward, double *fw_pwm_val);
 void command_motor_reverse(void);
 
 

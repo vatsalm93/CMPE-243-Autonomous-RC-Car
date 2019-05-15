@@ -11,7 +11,7 @@
 #include "can.h"
 #include "c_io.h"
 #include "speed_calculator.h"
-#include "_can_dbc/generated_can.h"
+#include "generated_can.h"
 
 #ifdef __cplusplus
 extern "C" {
