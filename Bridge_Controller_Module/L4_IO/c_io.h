@@ -15,6 +15,7 @@
 extern "C" {
 #endif
 
+
 void setLED(uint8_t ledNum, bool on);
 void setLCD_Display(char num);
 void Clear_Display(void);
@@ -22,7 +23,8 @@ void setLCD_LEFT(char num);
 void setLCD_Right(char num);
 uint8_t switch_detect(void);
 bool switch_function(int number);
-
+void init_gpio(void);
+void setLED_gpio(int led_num,bool on);
 
 #ifdef __cplusplus
 }

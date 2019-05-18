@@ -7,63 +7,29 @@ BRIDGE_NODE_t start_cmd = {0}; // 103
 CAR_CONTROL_t MotorCMD = {0}; //104
 SENSOR_NODE_t obstacle = {0}; // 105
 MOTOR_NODE_t MotorRPM = {0};  // 106
- //107
 //-------------------------------------------
 GPS_LOCATION_t RX_data ={0}; // 108
-
-COMPASS_t compass_data ={0}; // 109
+COMPASS_t compass_data = {0}; // 109
+MASTER_HEARTBEAT_t heartbeat = {0}; //110
 BRIDGE_DEBUG_t debug = {0};  //119
 
 const uint32_t GPS_LOCATION__MIA_MS = 3000;
 const GPS_LOCATION_t GPS_LOCATION__MIA_MSG = { 0 };
 const uint32_t COMPASS__MIA_MS=3000;
 const COMPASS_t COMPASS__MIA_MSG={0};
+const uint32_t  MASTER_HEARTBEAT__MIA_MS=3000;
+const MASTER_HEARTBEAT_t MASTER_HEARTBEAT__MIA_MSG={0};
 
 ble_msg_t ble_param;
-
-struct CoordinatesMap
-{
-    float m_latitude;
-    float m_longitude;
-};
+static bool setHeartbeat;
 
 #define MAX_LOCATIONS   7//20
-const struct CoordinatesMap LocationMappingTable[MAX_LOCATIONS] =
-{
-     {37.335064, -121.88114},//dummy
-     {37.335186, -121.881233},
-     {37.335205, -121.881264},
-     {37.335217, -121.881264},
-     {37.335217, -121.881279},
-     {37.335205, -121.881317},
-     {37.335194, -121.881332},
-/*    {37.334860, -121.881191}, //Health Center
-    {37.335040, -121.881320},
-    {37.335125, -121.881406},
-    {37.335168, -121.881325},
-    {37.335185, -121.881256},
-    {37.335278, -121.881266},
-    {37.335415, -121.881358},
-    {37.335650, -121.881540},
-    {37.335842, -121.881669},
-    {37.336046, -121.881776},
-    {37.336161, -121.881873},
-    {37.336306, -121.881991},
-    {37.336430, -121.882093},
-    {37.336554, -121.882200},
-    {37.336682, -121.882291},
-    {37.336712, -121.882366},
-    {37.336675, -121.882429},
-    {37.336534, -121.882735},
-    {37.336440, -121.882875},
-    {37.336419, -121.882950} // clarks Hall*/
-};
+#define MASTER_HEARTBEAT_MSG_ID 110
 
 void CAN_Init_w(void)
 {
     Clear_Display();
     if(CAN_init(can1, 100, 100, 100, NULL, NULL))
-
     {
         CAN_bypass_filter_accept_all_msgs();
         CAN_reset_bus(can1);
@@ -137,19 +103,35 @@ void CAN_Recieve(void)
             sprintf(ble_param.distance, " Distance:%f", compass_data.CMP_DISTANCE_meters);
             debug.IO_DEBUG_Bridge_rx = 0x00;
         }
+        else if(can_msg_hdr.mid == 110)
+        {
+              dbc_decode_MASTER_HEARTBEAT(&heartbeat, can_msg.data.bytes, &can_msg_hdr);
+              if(heartbeat.MASTER_hbt == 1)
+              {
+                  setHeartbeat = true;
+                  setLED_gpio(2,true);
+              }
+        }
     }
 
   if(dbc_handle_mia_GPS_LOCATION(&RX_data, 100))
   {
       //setLED(1,0);
-      printf("Mia Occured:GPS");
+      //printf("Mia Occured:GPS");
       debug.IO_DEBUG_Bridge_rx = 0x01;
   }
 
   if(dbc_handle_mia_COMPASS(&compass_data,100))
   {
       //setLED(2,0);
-      printf("Mia Occured:Compass");
+      //printf("Mia Occured:Compass");
+      debug.IO_DEBUG_Bridge_rx = 0x01;
+  }
+  if(dbc_handle_mia_MASTER_HEARTBEAT(&heartbeat,25))
+  {
+      //printf("Mia Occured:Compass");
+      setHeartbeat = false;
+      setLED_gpio(2,false);
       debug.IO_DEBUG_Bridge_rx = 0x01;
   }
 }
@@ -168,6 +150,7 @@ void CAN_Transmit_start(uint8_t data)
    can_msg.frame_fields.data_len = msg_hdr.dlc;
    // Queue the CAN message to be sent out
    data?setLCD_Right('1'):setLCD_Right('0');
+   data?setLED_gpio(1,true):setLED_gpio(1,false);
    success = CAN_tx(can1, &can_msg, 0);
    //printf("Transmit : %d\n",data);
 }
@@ -184,7 +167,7 @@ void CAN_Transmit_gpsCheckpoint(void)
    can_msg.frame_fields.data_len = msg_hdr.dlc;
    // Queue the CAN message to be sent out
    success = CAN_tx(can1, &can_msg, 0);
-  //s printf("Transmit : %d\n",success);
+  // printf("Transmit : %d\n",success);
 }
 
 bool transmit_heartbeat_on_can(void)
@@ -203,13 +186,11 @@ bool transmit_heartbeat_on_can(void)
    if(CAN_tx(can1, &can_msg, 0))
    {
       debug.IO_DEBUG_HBT_Transmit = 0x00;
-      setLED(4,1);
       return true;
    }
    else
    {
        debug.IO_DEBUG_HBT_Transmit = 0x01;
-       setLED(4,0);
        return false;
    }
 

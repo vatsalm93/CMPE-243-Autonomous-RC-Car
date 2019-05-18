@@ -6,10 +6,37 @@
  */
 #include "c_io.h"
 #include "io.hpp"
+#include "gpio.hpp"
+
+static GPIO bluetoothStatus(P0_30);
+static GPIO bridgeHeartBeat(P0_29);
 
 void setLED(uint8_t ledNum, bool on)
 {
     LE.set(ledNum, on);
+}
+
+void init_gpio(void)
+{
+    bluetoothStatus.setAsOutput();
+    bridgeHeartBeat.setAsOutput();
+}
+
+void setLED_gpio(int led_num,bool on)
+{
+    switch(led_num)
+    {
+        case 1:
+        {
+            bluetoothStatus.set(on);
+            break;
+        }
+        case 2:
+        {
+            bridgeHeartBeat.set(on);
+            break;
+        }
+    }
 }
 
 void setLCD_Display(char num)

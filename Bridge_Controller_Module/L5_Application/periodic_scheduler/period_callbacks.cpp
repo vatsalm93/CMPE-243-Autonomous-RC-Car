@@ -51,6 +51,7 @@ bool period_init(void)
 {
     BLE_init();
     CAN_Init_w();
+    init_gpio();
     return true;                // Must return true upon success
 }
 

@@ -12,6 +12,7 @@ extern "C" {
 #include "can.h"
 
 BRIDGE_CHECKPOINTS_t checkpoint;
+#define MAX_LOCATIONS   7
 
 void CANresetAfterBusOff(void);
 void canBus_callback(uint32_t data);
