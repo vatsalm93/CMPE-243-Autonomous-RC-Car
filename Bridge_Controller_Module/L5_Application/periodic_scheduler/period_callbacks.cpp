@@ -28,7 +28,6 @@
  * do must be completed within 1ms.  Running over the time slot will reset the system.
  */
 
-#include <Bridge_Module/ble_hc05.h>
 #include <stdint.h>
 #include <stdio.h>
 #include "periodic_callback.h"
@@ -71,7 +70,6 @@ void period_1Hz(uint32_t count) //1000ms
 {
     transmit_heartbeat_on_can();
     CANresetAfterBusOff();
-    BLE_tx();
     transmit_debug_on_can();
 }
 
@@ -81,13 +79,14 @@ void period_1Hz(uint32_t count) //1000ms
  */
 void period_10Hz(uint32_t count) //100ms
 {
-   check_for_data_on_ble();
+    BLE_rx();
+    BLE_tx();
+    //CAN_Transmit_gpsCheckpoint();
 }
 
 void period_100Hz(uint32_t count) //10ms
 {
     CAN_Recieve();
-
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():

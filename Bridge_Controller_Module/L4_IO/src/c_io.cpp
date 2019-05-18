@@ -32,7 +32,7 @@ void Clear_Display(void)
     LD.clear();
 }
 
-uint8_t switch_detect()
+uint8_t switch_detect(void)
 {
     uint8_t switches = SW.getSwitchValues();
     return switches;

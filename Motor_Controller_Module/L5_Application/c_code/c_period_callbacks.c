@@ -20,7 +20,8 @@
 #include "printf_lib.h"
 #include "rpm/c_pid.h"
 
-s_pid_t dc = {0};
+extern s_pid_t dc;
+double pwm_val_dc = 15.00;
 
 bool C_period_init(void) {
     setLED(1, 0);
@@ -29,7 +30,7 @@ bool C_period_init(void) {
     set_pwm_value(motor_1, 15);
     set_pwm_value(servo_2, 15);
     GPIO_interrupt();
-    eint3_enable_port2(6, eint_falling_edge, eint3_handler);
+    eint3_enable_port2(5, eint_falling_edge, eint3_handler);
     lcd_init();
     createPID(&dc);
 
@@ -41,8 +42,8 @@ bool C_period_reg_tlm(void) {
 
 void C_period_1Hz(uint32_t count) {
     (void) count;
-    motor_can_reset_busoff();
     motor_can_tx_heartbeat();
+    motor_can_reset_busoff();
     send_rpm();
     lcd_screen_query();
 }
@@ -50,9 +51,9 @@ void C_period_1Hz(uint32_t count) {
 void C_period_10Hz(uint32_t count) {
     (void) count;
     lcd_receive();
-    if(count % 4 == 0)
+    if (count % 4 == 0)
         calculate_speed();
-    command_motor(&drive);
+    command_motor(&drive, &pwm_val_dc);
 }
 
 void C_period_100Hz(uint32_t count) {

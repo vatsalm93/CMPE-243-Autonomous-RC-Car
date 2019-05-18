@@ -7,7 +7,7 @@
 
 #include "motor_control.h"
 #include "printf_lib.h"
-#include "rpm/c_pid.h"
+#include "c_pid.h"
 #include "servo_degree.h"
 
 #define STEP_UPHILL 0.002
@@ -24,13 +24,14 @@
 #define HARD_LEFT 11.00
 
 CAR_CONTROL_t drive = {MOTOR_STOP, NO_STEER, 0.00, {0}};
-extern s_pid_t dc;
-static float fw_pwm_val_motor = 15.00;
+s_pid_t dc = {0};
+
+//static float fw_pwm_val_motor = 15.00;
 
 static uint32_t reverse_count = 0;
 static bool reverse_flag = false;
 
-void command_motor(CAR_CONTROL_t *drive_motor) {
+void command_motor(CAR_CONTROL_t *drive_motor, double *cmd_pwm_val) {
     setLED(2, 0);
     setLED(3, 0);
     setLED(4, 0);
@@ -40,7 +41,7 @@ void command_motor(CAR_CONTROL_t *drive_motor) {
         case MOTOR_FORWARD:
             reverse_flag = false;
             setLED(2, 1);
-            forward_speed_control(drive_motor);
+            forward_speed_control(drive_motor, cmd_pwm_val);
             break;
 
         case MOTOR_STOP:
@@ -64,34 +65,33 @@ void command_servo(CAR_CONTROL_t *drive_servo){
     set_pwm_value(servo_2, percent);
 }
 
-void forward_speed_control(CAR_CONTROL_t *drive_forward) {
+void forward_speed_control(CAR_CONTROL_t *drive_forward, double *fw_pwm_val) {
     float speed = get_speed();
     float _error = calculate(drive_forward->MOTOR_kph, speed, &dc);
-    fw_pwm_val_motor += _error;
-    if(fw_pwm_val_motor < 15.00)
-        fw_pwm_val_motor = 15.00;
-     if(fw_pwm_val_motor > 16.1)
-        fw_pwm_val_motor = 16.1;
-    set_pwm_value(motor_1, fw_pwm_val_motor);
-    u0_dbg_printf("PWM: %f, Error: %f\n", fw_pwm_val_motor, _error);
+    *fw_pwm_val += _error;
+    if(*fw_pwm_val < 15.00)
+        *fw_pwm_val = 15.00;
+     if(*fw_pwm_val > 16.1)
+        *fw_pwm_val = 16.1;
+    set_pwm_value(motor_1, *fw_pwm_val);
+//    u0_dbg_printf("PWM: %f, Error: %f\n", fw_pwm_val_motor, _error);
 }
 
 void command_motor_reverse(void)
 {
     if (false == reverse_flag) {
-        if (6 == reverse_count) {
+
+        if (5 == reverse_count)
             reverse_flag = true;
+        if (6 == reverse_count)
             reverse_count = 0;
-        }
-        if (0 == reverse_count % 3) {
+
+        if (0 == reverse_count % 3)
             set_pwm_value(motor_1, STOP);
-        }
-        else if (1 == reverse_count % 3) {
+        else if (1 == reverse_count % 3)
             set_pwm_value(motor_1, STOP);
-        }
-        else if (2 == reverse_count % 3) {
+        else if (2 == reverse_count % 3)
             set_pwm_value(motor_1, REVERSE);
-        }
         ++reverse_count;
     }
     else {
