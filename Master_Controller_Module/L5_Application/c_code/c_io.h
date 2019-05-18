@@ -15,11 +15,15 @@
 extern "C" {
 #endif
 
+void clearLedDisplay(void);
 void setLED(uint8_t ledNum, bool on);
 void dispDataOnLedDisplay(uint8_t byte_to_display);
 void dispDataSetRightDigit(uint8_t alpha);
-void dispDataSetLeftDigit(uint8_t alpha);
+void dispDataSetLeftDigit(char alpha);
 uint8_t getLSDData(void);
+bool getSwitch(int num);
+void init_Ext_LED_as_output(void);
+void set_Ext_LED(int led_num, bool status);
 
 #ifdef __cplusplus
 }

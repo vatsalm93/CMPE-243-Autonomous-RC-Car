@@ -32,11 +32,7 @@
 #include "periodic_callback.h"
 #include <stdio.h>
 #include "utilities.h"
-#include "c_code/master.h"
-#include "io.hpp"
-#include "c_code/externs.h"
-#include "c_code/motor.h"
-
+#include "c_code/c_periodic_callbacks.h"
 
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
 const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
@@ -50,20 +46,17 @@ const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
 const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 
 /// Called once before the RTOS is started, this is a good place to initialize things once
-extern bool start_free_run_flag;
-extern bool free_run_motor_flag;
-extern bool free_steer_flag;
+
 bool period_init(void)
 {
-    master_controller_init();
-    return true;
+    return c_period_init();
 }
 
 /// Register any telemetry variables
 bool period_reg_tlm(void)
 {
     // Make sure "SYS_CFG_ENABLE_TLM" is enabled at sys_config.h to use Telemetry
-    return true;
+    return c_period_reg_tlm();
 }
 
 /**
@@ -72,73 +65,22 @@ bool period_reg_tlm(void)
  */
 void period_1Hz(uint32_t count)
 {
-    (void) count;
-    master_CAN_turn_on_bus_if_bus_off();
-    master_send_debug_msg();
-    transmit_heartbeat_on_can();
+    c_period_1Hz(count);
 }
 
 void period_10Hz(uint32_t count)
 {
-    (void) count;
-    if (SW.getSwitch(1))
-    {
-        start_free_run_flag = !start_free_run_flag;
-    }
-
-    if (SW.getSwitch(2))
-    {
-        free_run_motor_flag = !free_run_motor_flag;
-        if (free_run_motor_flag)
-            drive_motor_fwd_slow();
-        else
-            drive_motor_stop();
-    }
-
-    if (SW.getSwitch(3))
-    {
-        drive_motor_rev_slow();
-    }
-
-    if (SW.getSwitch(4))
-    {
-        free_steer_flag = !free_steer_flag;
-        if (free_steer_flag)
-            master_steer_full_right();
-        else
-            master_steer_full_left();
-    }
-
+    c_period_10Hz(count);
 }
 
 void period_100Hz(uint32_t count)
 {
-    (void) count;
-    master_service_can_msgs();
-    if (start_free_run_flag == false)
-    {
-        if ((true == sys_start_stop_cmd()))
-        {
-            start_obstacle_avoidance();
-        }
-        else
-        {
-            drive_motor_stop();
-            master_dont_steer();
-        }
-
-    }
-    master_send_command_to_motor_module();
-
-
-    //    sensors_100Hz();          //Do not uncomment
-    //    update_sensor_struct();   //Do not uncomment
-    //    send_msgs_on_can();       //Do not uncomment
+    c_period_100Hz(count);
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():
 // scheduler_add_task(new periodicSchedulerTask(run_1Khz = true));
 void period_1000Hz(uint32_t count)
 {
-    (void) count;
+    c_period_1000Hz(count);
 }
