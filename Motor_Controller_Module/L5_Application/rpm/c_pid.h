@@ -5,12 +5,19 @@
 extern "C" {
 #endif
 
-#define KP      0.0055
-#define KI      0.000025
-#define KD      0.0005
+#define KP      0.025
+#define KI      0.0005
+#define KD      0.009
 #define DT      0.1
 #define MIN     -255
 #define MAX     255
+
+//#define KP      0.0055
+//#define KI      0.000025
+//#define KD      0.0005
+//#define DT      0.1
+//#define MIN     -255
+//#define MAX     255
 
 typedef struct
 {

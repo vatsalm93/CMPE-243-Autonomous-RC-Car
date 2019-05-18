@@ -21,6 +21,6 @@ float get_speed(void) {
 float calculate_speed(void) {
     uint16_t rotation_per_sec = pulse;
     pulse = 0;
-    speed_km_hr = (circumference * rotation_per_sec * 3600) / (1000 * 2.7);
+    speed_km_hr = (circumference * rotation_per_sec) / (2.7);
     return speed_km_hr;
 }
