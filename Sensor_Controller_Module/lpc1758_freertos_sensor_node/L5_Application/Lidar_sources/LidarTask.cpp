@@ -12,7 +12,6 @@
 #include "c_code/c_pwm.h"
 #include "Lidar_includes/RPLidar.h"
 
-static PWM pwm2(PWM::pwm6, 100);
 static RPLidar lidar;
 static RPLidarRotation singleRotation;
 static rplidar_response_measurement_node_t raw_response_node;
@@ -30,12 +29,9 @@ bool Lidar::Lidar_init()
        lidar.reset();
        vTaskDelay(200);
     }
-    pwm2.set(0);
-    pwm2.set(100);
     uint32_t result = lidar.startScan(0,lidar.RPLIDAR_DEFAULT_TIMEOUT);
     if(!IS_OK(result))
     {
-        u0_dbg_printf("scanned timed out\n");
         return false;
     }
     return true;
@@ -51,11 +47,7 @@ void Lidar::Lidar_get_data()
         if(IS_OK(lidar.waitPoint(&raw_response_node, lidar.RPLIDAR_DEFAULT_TIMEOUT, &refined_response)))
             refined_response_buff[i] = refined_response;
     }
-    if(count%10 == 0)
-    {
-        xQueueReset(lidar.uart2.getRxQueue());
-        count = 0;
-    }
+
 }
 
 //Changes
@@ -69,6 +61,7 @@ void Lidar::Lidar_parse_data()
         p++;
     }
     lidar.divideAngle(refined_response_buff,length, &singleRotation);
+    //lidar.set_LEDS();
 }
 
 void Lidar::Lidar_send_data_CAN()

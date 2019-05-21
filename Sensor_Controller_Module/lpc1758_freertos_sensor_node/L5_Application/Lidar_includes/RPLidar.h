@@ -61,9 +61,10 @@ class RPLidar
         return _currentMeasurement;
     }
 
-    int divideDistance(float distance);
+    int divideDistancefront(float distance);
+    int divideDistanceback(float distance);
     void divideAngle(RPLidarMeasurement *angle_value,int length, RPLidarRotation *rot);
-
+    void set_LEDS();
 protected:
     uint32_t _sendCommand(uint8_t cmd, const void * payload, size_t payloadsize);
     uint32_t _waitResponseHeader(rplidar_ans_header_t * header, uint32_t timeout);

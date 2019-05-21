@@ -29,10 +29,11 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
 #include "periodic_callback.h"
 //#include "c_code/c_can.h"
 #include "Lidar_includes/ultrasonic_sensor.h"
-#include <stdio.h>
+#include "c_code/c_gpio.h"
 #include "_can_dbc/generated_can.h"
 #include "Lidar_includes/Sensor_CAN_Interfacing.h"
 #include "Lidar_includes/LidarTask.h"
@@ -53,6 +54,7 @@ const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 bool period_init(void)
 {
     sensor_can_init();
+    init_Ext_LED_as_output();
     //    return c_period_init(); // Must return true upon success
     return true;
 }
@@ -83,7 +85,7 @@ void period_10Hz(uint32_t count)
 
 void period_100Hz(uint32_t count)
 {
-
+    get_master_heartbeat();
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():

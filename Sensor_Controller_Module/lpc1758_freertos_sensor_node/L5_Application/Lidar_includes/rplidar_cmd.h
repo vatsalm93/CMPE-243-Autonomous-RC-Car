@@ -7,17 +7,6 @@
 //-----------------------------------------
 
 //DIVIDE INTO ANGLES
-#define DEGREES10  (10.0)
-#define DEGREES45  (45.0)
-#define DEGREES140  (140.0)
-#define DEGREES160  (160.0)
-#define DEGREES200  (200.0)
-#define DEGREES220  (220.0)
-#define DEGREES300  (300.0)
-#define DEGREES280 280.0
-#define DEGREES340 (340.0)
-#define DEGREES360 (360.0)
-
 #define DEGREE_0        0.0
 #define DEGREE_10       10.0
 #define DEGREE_20       20.0
@@ -83,12 +72,12 @@
 #define RPLIDAR_STATUS_OK                 0x0
 #define RPLIDAR_STATUS_WARNING            0x1
 #define RPLIDAR_STATUS_ERROR              0x2
-
+//
 #define RPLIDAR_RESP_MEASUREMENT_SYNCBIT        (0x1<<0)
 #define RPLIDAR_RESP_MEASUREMENT_QUALITY_SHIFT  2
 #define RPLIDAR_RESP_MEASUREMENT_CHECKBIT       (0x1<<0)
 #define RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT    1
-
+//
 // RP-Lidar Input Packets
 #define RPLIDAR_CMD_SYNC_BYTE        0xA5
 #define RPLIDAR_CMDFLAG_HAS_PAYLOAD  0x80

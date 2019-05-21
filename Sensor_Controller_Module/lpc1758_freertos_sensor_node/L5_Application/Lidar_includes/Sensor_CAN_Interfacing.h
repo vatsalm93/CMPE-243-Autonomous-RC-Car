@@ -15,6 +15,7 @@ bool sensor_can_init();
 bool sensor_send_data(RPLidarRotation *singleRotation);
 bool sensor_CAN_turn_on_bus_if_bus_off();
 bool transmit_heartbeat_on_can(void);
+void get_master_heartbeat(void);
 bool send_sensor_debug_msg(void);
 
 #endif /* SENSOR_CAN_INTERFACING_H_ */

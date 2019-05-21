@@ -26,18 +26,16 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
+#include <string.h>
+#include <stdio.h>
 #include <stddef.h>
 #include "lpc_sys.h"
 #include "utilities.h"
 #include "Lidar_includes/RPLidar.h"
-#include "printf_lib.h"
 #include "_can_dbc/generated_can.h"
-#include <string.h>
-#include <stdio.h>
+#include "c_code/c_gpio.h"
 
-
-#define distance_range 250.0
+//#define distance_range 250.0
 SENSOR_NODE_t sensor_cmd;
 static int previous_track[8] = {8};
 
@@ -147,30 +145,26 @@ uint32_t RPLidar::startScan(bool force, uint32_t timeout)
     uint32_t ans;
 
     stop(); //force the previous operation to stop
-    u0_dbg_printf("step1\n");
+
     ans = _sendCommand(force?RPLIDAR_CMD_FORCE_SCAN:RPLIDAR_CMD_SCAN, NULL, 0);
     if (IS_FAIL(ans)) return ans;
-    u0_dbg_printf("step2\n");
 
     // waiting for confirmation
     rplidar_ans_header_t response_header;
     if (IS_FAIL(ans = _waitResponseHeader(&response_header, timeout))) {
-        u0_dbg_printf("ans is %x\n",ans);
-        u0_dbg_printf("step3\n");
+
+
         return ans;
     }
 
     // verify whether we got a correct header
     if (response_header.type != RPLIDAR_ANS_TYPE_MEASUREMENT) {
-        u0_dbg_printf("step4\n");
         return RESULT_INVALID_DATA;
     }
 
     if (response_header.size < sizeof(rplidar_response_measurement_node_t)) {
-        u0_dbg_printf("step5\n");
         return RESULT_INVALID_DATA;
     }
-    u0_dbg_printf("step6\n");
     return RESULT_OK;
 }
 
@@ -280,36 +274,53 @@ uint32_t RPLidar::waitPoint(rplidar_response_measurement_node_t *node, uint32_t 
     return RESULT_OPERATION_TIMEOUT;
 }
 
-int RPLidar::divideDistance(float distance)
+int RPLidar::divideDistancefront(float distance)
 {
     int track;
-    if ((distance > 0) && (distance <= distance_range)) {
+    if ((distance > 0) && (distance <= 300)) {
         track = 0;
     }
-    else if ((distance > distance_range) && (distance <= distance_range * 2)) {
+    else if ((distance > 300) && (distance <= 550)) {
         track = 1;
     }
-    else if ((distance > distance_range * 2) && (distance <= distance_range * 3)) {
+    else if ((distance > 800) && (distance <= 1050)) {
         track = 2;
     }
-    else if ((distance > distance_range * 3) && (distance <= distance_range * 4)) {
+    else if ((distance > 1300) && (distance <= 1550)) {
         track = 3;
     }
-    else if ((distance > distance_range * 4) && (distance <= distance_range * 5)) {
+    else if ((distance > 1800) && (distance <= 2050)) {
         track = 4;
     }
-    else if ((distance > distance_range * 5) && (distance <= distance_range * 6)) {
-        track = 5;
-    }
-    else if ((distance > distance_range * 6) && (distance <= distance_range * 7)) {
-        track = 6;
-    }
+
     else {
         track = 7;
     }
     return track;
 }
-
+int RPLidar::divideDistanceback(float distance)
+{
+    int track;
+        if ((distance > 0) && (distance <= 80)) {
+            track = 0;
+        }
+        else if ((distance > 80) && (distance <= 330)) {
+            track = 1;
+        }
+        else if ((distance > 330) && (distance <= 580)) {
+            track = 2;
+        }
+        else if ((distance > 580) && (distance <= 830)) {
+            track = 3;
+        }
+        else if ((distance > 1080) && (distance <= 1340)) {
+            track = 4;
+        }
+        else {
+            track = 7;
+        }
+        return track;
+}
 void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLidarRotation *rot)
 {
 
@@ -324,7 +335,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
         if(measurement_buff[i].quality!=0){
             if(measurement_buff[i].angle >= DEGREE_0 && measurement_buff[i].angle < DEGREE_10) //0-10
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistancefront(measurement_buff[i].distance);
                 if (track < previous_track[0])
                 {
                     rot->s0 = track;
@@ -334,17 +345,17 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_10 && measurement_buff[i].angle < DEGREE_20) //10-20
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistancefront(measurement_buff[i].distance);
                 if (track < previous_track[1])
                 {
-                    rot->s1 = track;
-                    previous_track[1] = track;
+                    rot->s0 = track;
+                    previous_track[0] = track;
                 }
-                sensor_cmd.LIDAR_Obstacle_RIGHT = rot->s1;
+                sensor_cmd.LIDAR_Obstacle_FRONT = rot->s0;
             }
             else if(measurement_buff[i].angle >= DEGREE_20 && measurement_buff[i].angle < DEGREE_30) //20-30
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistancefront(measurement_buff[i].distance);
                 if (track < previous_track[1])
                 {
                     rot->s1 = track;
@@ -354,7 +365,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_30 && measurement_buff[i].angle < DEGREE_40) //30-40
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistancefront(measurement_buff[i].distance);
                 if (track < previous_track[1])
                 {
                     rot->s1 = track;
@@ -364,7 +375,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_40 && measurement_buff[i].angle < DEGREE_50) //40-50
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistancefront(measurement_buff[i].distance);
                 if (track < previous_track[1])
                 {
                     rot->s1 = track;
@@ -410,7 +421,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_140 && measurement_buff[i].angle < DEGREE_150) //140-150
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistanceback(measurement_buff[i].distance);
                 if (track < previous_track[2])
                 {
                     rot->s2 = track;
@@ -420,7 +431,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_150 && measurement_buff[i].angle < DEGREE_160) //150-160
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistanceback(measurement_buff[i].distance);
                 if (track < previous_track[2])
                 {
                     rot->s2 = track;
@@ -430,7 +441,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_160 && measurement_buff[i].angle < DEGREE_170) //160-170
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistanceback(measurement_buff[i].distance);
                 if (track < previous_track[2])
                 {
                     rot->s2 = track;
@@ -440,7 +451,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_170 && measurement_buff[i].angle < DEGREE_180) //170-180
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistanceback(measurement_buff[i].distance);
                 if (track < previous_track[3])
                 {
                     rot->s3 = track;
@@ -450,7 +461,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_180 && measurement_buff[i].angle < DEGREE_190) //180-190
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistanceback(measurement_buff[i].distance);
                 if (track < previous_track[3])
                 {
                     rot->s3 = track;
@@ -460,7 +471,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_190 && measurement_buff[i].angle < DEGREE_200) //190-200
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistanceback(measurement_buff[i].distance);
                 if (track < previous_track[4])
                 {
                     rot->s4 = track;
@@ -470,7 +481,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_200 && measurement_buff[i].angle < DEGREE_210) //200-210
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistanceback(measurement_buff[i].distance);
                 if (track < previous_track[4])
                 {
                     rot->s4 = track;
@@ -480,7 +491,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_210 && measurement_buff[i].angle < DEGREE_220) //210-220
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistanceback(measurement_buff[i].distance);
                 if (track < previous_track[4])
                 {
                     rot->s4 = track;
@@ -526,7 +537,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_310 && measurement_buff[i].angle < DEGREE_320) //310-320
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistancefront(measurement_buff[i].distance);
                 if (track < previous_track[5])
                 {
                     rot->s5 = track;
@@ -536,7 +547,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_320 && measurement_buff[i].angle < DEGREE_330) //320-330
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistancefront(measurement_buff[i].distance);
                 if (track < previous_track[5])
                 {
                     rot->s5 = track;
@@ -546,7 +557,7 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_330 && measurement_buff[i].angle < DEGREE_340) //330-340
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistancefront(measurement_buff[i].distance);
                 if (track < previous_track[5])
                 {
                     rot->s5 = track;
@@ -556,17 +567,17 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
             }
             else if(measurement_buff[i].angle >= DEGREE_340 && measurement_buff[i].angle < DEGREE_350) //340-350
             {
-                track = divideDistance(measurement_buff[i].distance);
-                if (track < previous_track[5])
+                track = divideDistancefront(measurement_buff[i].distance);
+                if (track < previous_track[0])
                 {
-                    rot->s5 = track;
+                    rot->s0 = track;
                     previous_track[5] = track;
                 }
-                sensor_cmd.LIDAR_Obstacle_LEFT = rot->s5;
+                sensor_cmd.LIDAR_Obstacle_FRONT = rot->s0;
             }
             else if(measurement_buff[i].angle >= DEGREE_350 && measurement_buff[i].angle < DEGREE_360) //350-360
             {
-                track = divideDistance(measurement_buff[i].distance);
+                track = divideDistancefront(measurement_buff[i].distance);
                 if (track < previous_track[0])
                 {
                     rot->s0 = track;
@@ -575,93 +586,39 @@ void RPLidar::divideAngle(RPLidarMeasurement *measurement_buff, int length, RPLi
                 sensor_cmd.LIDAR_Obstacle_FRONT = rot->s0;
             }
         }
+        set_LEDS();
     }
 
-#if 0
-    for(int i=0; i<length; i++)
-    {
-      int track = 8;
-      if(measurement_buff[i].quality!=0){
-          if(measurement_buff[i].angle >= 0.0 && measurement_buff[i].angle <= DEGREES10) //0-10
-                 {
-                     track = divideDistance(measurement_buff[i].distance);
-                     rot->s0 = previous_track[0];
-                     if (track < previous_track[0])
-                     {
-                         rot->s0 = track;
-                         previous_track[0] = track;
-                     }
-                     sensor_cmd.LIDAR_Obstacle_FRONT = rot->s0;
-                 }
-                 else if(measurement_buff[i].angle > DEGREES10 && measurement_buff[i].angle <= DEGREES45)
-                   {
-                      track = divideDistance(measurement_buff[i].distance);
-                      rot->s1 = previous_track[1];
-                       if (track < previous_track[1]) rot->s1 = track;
-                       previous_track[1] = track;
-                       sensor_cmd.LIDAR_Obstacle_RIGHT  = rot->s1;
-                   }
-
-                   else if(measurement_buff[i].angle > DEGREES140 && measurement_buff[i].angle <= DEGREES160)
-                   {
-                       track = divideDistance(measurement_buff[i].distance);
-                       rot->s3 = previous_track[3];
-                       if (track < previous_track[3]) rot->s3 = track;
-                       previous_track[3] = track;
-                       sensor_cmd.LIDAR_Obstacle_BACK_RIGHT  = rot->s3;
-                   }
-                   else if(measurement_buff[i].angle > DEGREES160 && measurement_buff[i].angle <= DEGREES200)
-                   {
-                       track = divideDistance(measurement_buff[i].distance);
-                       rot->s4 = previous_track[4];
-                       if (track < previous_track[4]) rot->s4 = track;
-                       previous_track[4] = track;
-                       sensor_cmd.LIDAR_Obstacle_BACK  = rot->s4;
-                   }
-                   else if(measurement_buff[i].angle > DEGREES200 && measurement_buff[i].angle <= DEGREES220)
-                   {
-                       track = divideDistance(measurement_buff[i].distance);
-                       rot->s5 = previous_track[5];
-                       if (track < previous_track[5]) rot->s5 = track;
-                       previous_track[5] = track;
-                       sensor_cmd.LIDAR_Obstacle_BACK_LEFT  = rot->s5;
-                   }
-
-                   else if(measurement_buff[i].angle > DEGREES300 && measurement_buff[i].angle <= DEGREES340)
-                   {
-                       track = divideDistance(measurement_buff[i].distance);
-//                       rot->s6 = previous_track[6];
-                       if (track < previous_track[6])
-                       {
-                           rot->s6 = track;
-                           previous_track[6] = track;
-                       }
-                       sensor_cmd.LIDAR_Obstacle_LEFT = rot->s6;
-                   }
-                   else if(measurement_buff[i].angle > DEGREES280 && measurement_buff[i].angle <= DEGREES300)
-                   {
-                       track = divideDistance(measurement_buff[i].distance);
-//                       rot->s6 = previous_track[6];
-                       if (track < previous_track[6])
-                       {
-                           rot->s6 = track;
-                           previous_track[6] = track;
-                       }
-                       sensor_cmd.LIDAR_Obstacle_LEFT = rot->s6;
-                   }
-                   else if(measurement_buff[i].angle > DEGREES340 && measurement_buff[i].angle < DEGREES360)
-                   {
-                       track = divideDistance(measurement_buff[i].distance);
-                      // rot->s0 = previous_track[0];
-                       if (track < previous_track[0])
-                       {
-                           rot->s0 = track;
-                           previous_track[0] = track;
-                       }
-                       sensor_cmd.LIDAR_Obstacle_FRONT = rot->s0;
-                   }
-               }
-    }
-#endif
 }
 
+void RPLidar::set_LEDS()
+{
+    if(sensor_cmd.LIDAR_Obstacle_RIGHT>=0 && sensor_cmd.LIDAR_Obstacle_RIGHT<5)
+    {
+        set_Ext_LED(P1_20,1);
+    }
+    else
+    {
+        set_Ext_LED(P1_20,0);
+    }
+
+    if(sensor_cmd.LIDAR_Obstacle_BACK>=0 &&sensor_cmd.LIDAR_Obstacle_BACK<5)
+    {
+        set_Ext_LED(P0_29,1);
+    }
+    else
+    {
+        set_Ext_LED(P0_29,0);
+    }
+
+    if(sensor_cmd.LIDAR_Obstacle_LEFT>=0 && sensor_cmd.LIDAR_Obstacle_LEFT<5)
+    {
+        set_Ext_LED(P0_30,1);
+
+    }
+    else
+    {
+        set_Ext_LED(P0_30,0);
+
+    }
+}
