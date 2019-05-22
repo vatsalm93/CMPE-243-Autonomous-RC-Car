@@ -9,6 +9,7 @@
 #include "printf_lib.h"
 #include "c_pid.h"
 #include "servo_degree.h"
+#include "c_gpio.h"
 
 #define STEP_UPHILL 0.002
 #define STEP_DOWNHILL 0.0004
@@ -26,31 +27,30 @@
 CAR_CONTROL_t drive = {MOTOR_STOP, NO_STEER, 0.00, {0}};
 s_pid_t dc = {0};
 
-//static float fw_pwm_val_motor = 15.00;
-
 static uint32_t reverse_count = 0;
 static bool reverse_flag = false;
 
 void command_motor(CAR_CONTROL_t *drive_motor, double *cmd_pwm_val) {
-    setLED(2, 0);
-    setLED(3, 0);
-    setLED(4, 0);
+    motor_set_led(_p0_29, 0); //Forward LED
+    motor_set_led(_p1_19, 0); //Reverse LED
+    motor_set_led(_p0_30, 0); //Stop LED
 
     switch (drive_motor->MOTOR_DRIVE_cmd) {
 
         case MOTOR_FORWARD:
             reverse_flag = false;
-            setLED(2, 1);
+            motor_set_led(_p0_29, 1);
             forward_speed_control(drive_motor, cmd_pwm_val);
             break;
 
         case MOTOR_STOP:
             reverse_flag = false;
             set_pwm_value(motor_1, STOP);
-            setLED(4, 1);
+            motor_set_led(_p0_30, 1);
             break;
 
         case MOTOR_REV:
+            motor_set_led(_p1_19, 1);
             command_motor_reverse();
             break;
 
@@ -67,14 +67,33 @@ void command_servo(CAR_CONTROL_t *drive_servo){
 
 void forward_speed_control(CAR_CONTROL_t *drive_forward, double *fw_pwm_val) {
     float speed = get_speed();
+//    float _error = speed - drive_forward->MOTOR_kph;
+//
+//    if(_error > 0)
+//        *fw_pwm_val -= _error/12;
+//    else if(_error < 0)
+//        *fw_pwm_val -= _error/22;
+//    else{}
+//
+//    if(*fw_pwm_val < 15.5)
+//        *fw_pwm_val = 15.5;
+//    else if(*fw_pwm_val > 16.3)
+//        *fw_pwm_val = 16.3;
+
     float _error = calculate(drive_forward->MOTOR_kph, speed, &dc);
-    *fw_pwm_val += _error;
-    if(*fw_pwm_val < 15.00)
-        *fw_pwm_val = 15.00;
-     if(*fw_pwm_val > 16.1)
-        *fw_pwm_val = 16.1;
+    if(_error > 0)
+        *fw_pwm_val += _error*2;
+    else if(_error < 0)
+        *fw_pwm_val += _error*1.5;
+    else{}
+//    *fw_pwm_val += _error;
+    if(*fw_pwm_val < 15.60)
+        *fw_pwm_val = 15.60;
+     if(*fw_pwm_val > 16.3)
+        *fw_pwm_val = 16.3;
     set_pwm_value(motor_1, *fw_pwm_val);
-//    u0_dbg_printf("PWM: %f, Error: %f\n", fw_pwm_val_motor, _error);
+//    u0_dbg_printf("SPEED: %f", drive_forward->MOTOR_kph);
+//    u0_dbg_printf("PWM: %f", *fw_pwm_val);
 }
 
 void command_motor_reverse(void)

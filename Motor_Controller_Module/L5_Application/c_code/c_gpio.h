@@ -15,7 +15,16 @@
 extern "C" {
 #endif
 
+typedef enum {
+    _p0_29,
+    _p0_30,
+    _p1_19,
+    _p1_20,
+} MOTOR_LED;
+
 void GPIO_interrupt(void);
+void init_LEDs(void);
+void motor_set_led(MOTOR_LED port_pin, bool sts);
 
 #ifdef __cplusplus
 }
