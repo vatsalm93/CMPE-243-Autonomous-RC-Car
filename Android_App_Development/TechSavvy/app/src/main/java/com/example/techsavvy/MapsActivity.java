@@ -46,6 +46,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     boolean isPolyLineSet = false;
     locationThread liveLocationThread;
     Polyline line;
+    final static int noOfCheckpoints = 3;
 
 
     @Override
@@ -101,9 +102,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+
 
         //mMap2 = googleMap;
         mMap.setOnMapLongClickListener(this);
+
+        //Array for checkpoints
+        LatLng[] Checkpoints = new LatLng[noOfCheckpoints];
+
+        //Music Building
+        Checkpoints[0]=new LatLng(37.335861, -121.881237);
+        Checkpoints[1]=new LatLng(37.336935, -121.880575);
+
 
         Intent intent = getIntent();
         //Get Longitude and Latitude Values
@@ -131,9 +142,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         String markerDisplay = "Lat: " + latitudeStr + "   Long: " + longitudeStr;
         Toast.makeText(this, markerDisplay, Toast.LENGTH_LONG).show();
 
+        /*if(Bluetooth.mapButtonCnt != 0)
+        {
+
+        }*/
+
+
         // Add a marker and move the camera
         srcMarker = mMap.addMarker(new MarkerOptions().position(sourceLocation).title(markerDisplay));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sourceLocation, 18));
+
+        //Add Checkpoint markers
+        //for ( int i=0; i<Checkpoints.length; i++) {
+            mMap.addMarker(new MarkerOptions().position(Checkpoints[0]).title("Checkpoint 1: Music Building").icon(BitmapDescriptorFactory
+                    .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+            mMap.addMarker(new MarkerOptions().position(Checkpoints[1]).title("Checkpoint 2").icon(BitmapDescriptorFactory
+                .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+        //}
     }
 
     @Override

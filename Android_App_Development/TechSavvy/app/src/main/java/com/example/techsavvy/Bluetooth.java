@@ -69,6 +69,7 @@ public class Bluetooth extends AppCompatActivity {
     private static float mcompass_rx;
     static boolean cmdStartStop = false;
     static boolean flagStartButtonPressed;
+    static int mapButtonCnt = 0;
 
 
     private final String TAG = MainActivity.class.getSimpleName();
