@@ -33,7 +33,7 @@ bool C_period_init(void) {
     eint3_enable_port2(5, eint_falling_edge, eint3_handler);
     lcd_init();
     createPID(&dc);
-
+    init_LEDs();
     return true;
 }
 bool C_period_reg_tlm(void) {

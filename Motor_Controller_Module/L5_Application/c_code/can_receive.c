@@ -6,7 +6,7 @@
  */
 #include "can_receive.h"
 #include "c_pwm.h"
-#include "printf_lib.h"
+#include "c_gpio.h"
 #include "speed_calculator.h"
 
 #define TIMEOUT_MS 0
@@ -30,6 +30,7 @@ static BRIDGE_CHECKPOINTS_t bridge_checkpoint_msg = {0};
 static SENSOR_NODE_t sensor_msg = {0};
 static GPS_LOCATION_t gps_msg = {0};
 static COMPASS_t compass_msg = {0};
+static MASTER_HEARTBEAT_t master_hrtbt = {0};
 
 bool receive_can_msg(void){
     can_msg_t can_motor_msg;
@@ -78,6 +79,10 @@ bool receive_can_msg(void){
                 gps_heading = compass_msg.CMP_HEADING_deg;
                 gps_bearing = compass_msg.CMP_BEARING_deg;
                 break;
+            case 110: // Master heartbeat
+                dbc_decode_MASTER_HEARTBEAT(&master_hrtbt, can_motor_msg.data.bytes, &can_msg_hdr);
+                motor_set_led(_p1_20, 1);
+                break;
         }
     }
 
@@ -99,6 +104,10 @@ bool receive_can_msg(void){
     if(dbc_handle_mia_BRIDGE_NODE(&bridge_msg, 100))
     {
         bridge_status = 0;
+    }
+    if(dbc_handle_mia_MASTER_HEARTBEAT(&master_hrtbt, 30)) {
+        motor_set_led(_p1_20, 0);
+        master_status = 0;
     }
     return motor_rx_flag;
 }
