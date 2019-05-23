@@ -5,6 +5,16 @@
 
 // Commands
 //-----------------------------------------
+#define DEGREES10  (10.0)
+#define DEGREES45  (45.0)
+#define DEGREES140  (140.0)
+#define DEGREES160  (160.0)
+#define DEGREES200  (200.0)
+#define DEGREES220  (220.0)
+#define DEGREES300  (300.0)
+#define DEGREES280 280.0
+#define DEGREES350 (350.0)
+#define DEGREES360 (360.0)
 
 //DIVIDE INTO ANGLES
 #define DEGREE_0        0.0

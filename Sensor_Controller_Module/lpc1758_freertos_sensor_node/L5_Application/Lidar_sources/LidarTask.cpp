@@ -55,13 +55,12 @@ void Lidar::Lidar_parse_data()
 {
     int length = (sizeof(refined_response_buff))/(sizeof(refined_response_buff[0]));
     int *p = (int *)&singleRotation;
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < 7; i++)
     {
-        *p = 13;
+        *p = 7;
         p++;
     }
     lidar.divideAngle(refined_response_buff,length, &singleRotation);
-    //lidar.set_LEDS();
 }
 
 void Lidar::Lidar_send_data_CAN()

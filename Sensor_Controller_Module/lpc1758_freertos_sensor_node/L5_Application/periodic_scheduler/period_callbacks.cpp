@@ -85,7 +85,7 @@ void period_10Hz(uint32_t count)
 
 void period_100Hz(uint32_t count)
 {
-    get_master_heartbeat();
+   // get_master_heartbeat();
 }
 
 // 1Khz (1ms) is only run if Periodic Dispatcher was configured to run it at main():
