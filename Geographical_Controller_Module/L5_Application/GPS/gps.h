@@ -16,28 +16,36 @@ extern "C" {
 #define UART2_BAUD_RATE  57600  ///< Baud rate you wish to use (it will auto-detect and change to this)
 #define UART_RECEIVE_BUFFER_SIZE 120
 #define UART_TRANSMIT_BUFFER_SIZE 60
+#define INVALID_COORDINATES 0.0
+#define GPS_CHECKPOINT_MAX_DISTANCE 9999.9
+
+/* The buffer for reading GPS messages. */
+char gps_line[UART_RECEIVE_BUFFER_SIZE];
+double latitude;
+double longitude;
 
 void init_gps(void);
-void check_for_data_on_gps(void);
 void gps_tx(void);
-float getLatitude(void);
-float getLongitude(void);
+double getLatitude(void);
+double getLongitude(void);
 bool gps_parse_data(void);
 void create_gps_config(void);
 void gps_rx(void);
-float HeadingAngle(float lat, float lon);
-float calcDistance(float latDest, float lonDest);
-
+double HeadingAngle(double lat, double lon);
+double calculate_target_distance(double latDest, double lonDest, double curLat, double curLong);
 
 // different commands to set the update rate from once a second (1 Hz) to 10 times a second (10Hz)
 // Note that these only control the rate at which the position is echoed, to actually speed up the
 // position fix you must also send one of the position fix rate commands below too.
 #define PMTK_SET_NMEA_UPDATE_10HZ "$PMTK220,100*2F"
 #define PMTK_API_SET_FIX_CTL_5HZ  "$PMTK300,200,0,0,0,0*2F"
+#define PMTK_SET_NMEA_UPDATE_5HZ  "$PMTK220,200*2C"
+
 // turn on only the second sentence (GPRMC)
 #define PMTK_SET_NMEA_OUTPUT_RMCONLY "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29"
 #define PMTK_SET_BAUD_57600 "$PMTK251,57600*2C"
 #define PMTK_API_SET_FIX_CTL_1HZ  "$PMTK300,1000,0,0,0,0*1C"
+#define PMTK_SET_NMEA_UPDATE_1HZ  "$PMTK220,1000*1F"
 
 #if 0
 // Position fix update rate commands.
@@ -88,11 +96,6 @@ float calcDistance(float latDest, float lonDest);
 // how long to wait when we're looking for a response
 #define MAXWAITSENTENCE 10
 #endif
-
-    /* The buffer for reading GPS messages. */
-    char gps_line[UART_RECEIVE_BUFFER_SIZE];
-    float latitude;
-    float longitude;
 
 #ifdef __cplusplus
 }

@@ -33,7 +33,6 @@
 #include "semphr.h"
 
 
-
 /**
  * Terminal task is our UART0 terminal that handles our commands into the board.
  * This also saves and restores the "disk" telemetry.  Disk telemetry variables

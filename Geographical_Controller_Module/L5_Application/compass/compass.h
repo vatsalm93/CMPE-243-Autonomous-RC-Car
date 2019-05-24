@@ -20,6 +20,13 @@ extern "C" {
 #define READ_TWO_REGISTERS  2                    //Read two registers
 #define COMPASS_OFFSET 10;
 
+enum {
+    sw1 = (1 << 0),
+    sw2 = (1 << 1),
+    sw3 = (1 << 2),
+    sw4 = (1 << 3),
+}switch_pressed;
+
 float Compass_Get_Bearing_Angle(void);
 void Start_Compass_Calibration(void);
 void Stop_Compass_Calibration(void);

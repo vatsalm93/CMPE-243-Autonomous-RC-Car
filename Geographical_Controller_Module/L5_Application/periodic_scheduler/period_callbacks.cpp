@@ -36,9 +36,11 @@
 #include "can_code/can_tx.h"
 #include "compass/compass.h"
 #include <GPS/gps.h>
+#include <c_wrapper/c_io.h>
 
 /// This is the stack size used for each of the period tasks (1Hz, 10Hz, 100Hz, and 1000Hz)
 const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
+GPIO gpio1_0(P1_29);
 
 /**
  * This is the stack size of the dispatcher task that triggers the period tasks to run.
@@ -48,14 +50,13 @@ const uint32_t PERIOD_TASKS_STACK_SIZE_BYTES = (512 * 4);
  */
 const uint32_t PERIOD_MONITOR_TASK_STACK_SIZE_BYTES = (512 * 3);
 
-
-GPIO gpio1_0(P1_29);
 /// Called once before the RTOS is started, this is a good place to initialize things once
 bool period_init(void)
 {
     gpio1_0.setAsInput();
     init_gps();
     can_init();
+    init_gpio();//LED
     return true;
 }
 
@@ -75,15 +76,20 @@ void period_1Hz(uint32_t count)
     get_compass_data();
     transmit_heartbeat_on_can();
     transmit_debug_data_on_can();
+
+    printf("Index: %d,",location_index);
+//    printf("D: %f",calculated_distance);
+//    printf("Lat: %f,", getLatitude());
+//    printf("Lon: %f\n", getLongitude());
 }
 
 void period_10Hz(uint32_t count)
 {
-    gps_rx();
+//    gps_rx();
     can_receive();
-    gps_parse_data();
-    // Send out Driver command at 10Hz
     transmit_compass_data_on_can();
+
+    // Send out Driver command at 10Hz
 }
 
 void period_100Hz(uint32_t count)
@@ -95,4 +101,12 @@ void period_100Hz(uint32_t count)
 // scheduler_add_task(new periodicSchedulerTask(run_1Khz = true));
 void period_1000Hz(uint32_t count)
 {
+}
+
+void separate_task(void *p)
+{
+       while(1)
+       {
+           gps_rx();
+    }
 }

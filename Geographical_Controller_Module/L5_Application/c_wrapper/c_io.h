@@ -15,13 +15,6 @@
 extern "C" {
 #endif
 
-enum {
-    sw1 = (1 << 0),
-    sw2 = (1 << 1),
-    sw3 = (1 << 2),
-    sw4 = (1 << 3),
-}switch_pressed;
-
 void setLED(uint8_t ledNum, bool on);
 void setLCD_Display(char num);
 void Clear_Display(void);
@@ -29,6 +22,8 @@ void setLCD_LEFT(char num);
 void setLCD_Right(char num);
 uint8_t switch_detect(void);
 bool switch_function(int number);
+void init_gpio(void);
+void setLED_gpio(int led_num,bool on);
 
 
 #ifdef __cplusplus

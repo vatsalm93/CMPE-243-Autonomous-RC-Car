@@ -25,6 +25,8 @@
  */
 #include "tasks.hpp"
 #include "examples/examples.hpp"
+#include "can_code/can_tx.h"
+
 
 /**
  * The main() creates tasks or "threads".  See the documentation of scheduler_task class at scheduler_task.hpp
@@ -41,6 +43,7 @@
  *        there is no semaphore configured for this bus and it should be used exclusively by nordic wireless.
  */
 
+
 int main(void)
 {
     /**
@@ -54,6 +57,10 @@ int main(void)
      * control codes can be learned by typing the "learn" terminal command.
      */
     scheduler_add_task(new terminalTask(PRIORITY_HIGH));
+
+    extern void separate_task(void *p);
+
+    xTaskCreate(separate_task,"GPS", STACK_BYTES(2048), 0, 1, 0);
 
     /* Consumes very little CPU, but need highest priority to handle mesh network ACKs */
    // scheduler_add_task(new wirelessTask(PRIORITY_CRITICAL));
