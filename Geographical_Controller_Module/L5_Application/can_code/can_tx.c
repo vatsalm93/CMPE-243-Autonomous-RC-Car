@@ -79,7 +79,7 @@ bool transmit_gps_data_on_can(void)
         return (CAN_tx(can1, &can_msg, 0));
     }
 }
-bool get_new_checkpoint = true;
+
 bool transmit_compass_data_on_can(void)
 {
     static int ld_count = 0;
@@ -95,42 +95,13 @@ bool transmit_compass_data_on_can(void)
     else
         debug_cmd.IO_DEBUG_Compass_Rx = 0;
 
- /*   if(calculated_distance <= 7)
-    {
-        get_new_checkpoint = true;
-    }
-    else
-    {
-        get_new_checkpoint = false;
-    }
-
-    if (true == get_new_checkpoint)
-    {
-        setLED(2,1);
-        get_new_checkpoint = false;
-        location_index = calculate_initial_checkpoint(latitude,longitude);
-    }
-    calculated_distance = calculate_target_distance(gps_checkpoints[location_index][0], gps_checkpoints[location_index][1],latitude,longitude); //gps_checkpoints[location_index][0], gps_checkpoints[location_index][1]
-    Heading_value = HeadingAngle(gps_checkpoints[location_index][0], gps_checkpoints[location_index][1]);
-*/
     if(location_index >= MAX_ROUTE_INDEX || calculated_distance <= 5.0)
     {
        location_index = calculate_initial_checkpoint(latitude,longitude);
     }
     calculated_distance = calculate_target_distance(gps_checkpoints[location_index][0], gps_checkpoints[location_index][1],latitude,longitude); //gps_checkpoints[location_index][0], gps_checkpoints[location_index][1]
     Heading_value = HeadingAngle(gps_checkpoints[location_index][0], gps_checkpoints[location_index][1]);
-//
-//    if((checkpoint_lat == INVALID_COORDINATES && checkpoint_long == INVALID_COORDINATES) || (location_index > MAX_ROUTE_INDEX))
-//    {
-//        calculated_distance = calculate_target_distance(checkpoint_lat,checkpoint_long,latitude,longitude);
-//        Heading_value = HeadingAngle(checkpoint_lat, checkpoint_long);
-//    }
-//    else {
-//        calculated_distance = calculate_target_distance(gps_checkpoints[location_index][0], gps_checkpoints[location_index][1],latitude,longitude); //gps_checkpoints[location_index][0], gps_checkpoints[location_index][1]
-//        Heading_value = HeadingAngle(gps_checkpoints[location_index][0], gps_checkpoints[location_index][1]);
-//    }
 
-   // calculated_distance = calculate_target_distance(checkpoint_lat,checkpoint_long,latitude,longitude); //gps_checkpoints[location_index][0], gps_checkpoints[location_index][1]
     compass_msg.CMP_BEARING_deg = compass_Bearing_value;
     compass_msg.CMP_HEADING_deg = (float)Heading_value;
     compass_msg.CMP_DISTANCE_meters = (float)calculated_distance;
@@ -140,11 +111,7 @@ bool transmit_compass_data_on_can(void)
     {
         ld_count = 0;
         Clear_Display();
-       // uint8_t display_distance = location_index;//(uint8_t)calculated_distance;
-       // if(display_distance < MAX_DISPLAY_DISTANCE)
-           setLCD_Display(location_index);
-       // else
-       //     setLCD_Display(MAX_DISPLAY_DISTANCE-1);
+        setLCD_Display(location_index);
     }
 
     dbc_msg_hdr_t msg_hdr = dbc_encode_COMPASS(can_msg.data.bytes, &compass_msg);
